@@ -154,11 +154,11 @@ export function CTACounter() {
 
   return (
     <section ref={sectionRef} className="relative w-full overflow-hidden" style={{ perspective: '1000px' }}>
-      {/* Background Image & Overlay */}
-      <div className="absolute inset-0 z-0">
+      {/* Background Image with Parallax & Blur */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
         <Image 
-          src="https://framerusercontent.com/images/DaujIxGV3kuIKq2CePL4JZDnJWU.jpg" 
-          alt="Construction background" 
+          src="/images/cta_bg_2.png"
+          alt="Almedin Construction Background" 
           fill
           className="object-cover cta-bg-image origin-center will-change-transform"
           sizes="100vw"

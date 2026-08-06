@@ -200,11 +200,14 @@ export function ScrollCarousel3D({
                   </div>
 
                   {/* Bottom Logo */}
-                  <div className="absolute bottom-6 left-6 z-10">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="12" r="10" fill={logoColor} />
-                      <path d="M12 2V22M2 12H22" stroke={logoCross} strokeWidth="3" />
-                    </svg>
+                  <div className="absolute bottom-6 left-6 z-10 w-6 h-6">
+                    <Image 
+                      src="/logo.png" 
+                      alt="Logo" 
+                      fill 
+                      className={`object-contain ${isRed || isBlack ? 'brightness-0 invert' : ''}`}
+                      sizes="24px"
+                    />
                   </div>
 
                 </div>

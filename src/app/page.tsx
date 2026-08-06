@@ -4,6 +4,8 @@ import { Projects } from '@/components/sections/Projects';
 import { Steps } from '@/components/sections/Steps';
 import { CTACounter } from '@/components/sections/CTACounter';
 import { Testimonials } from '@/components/sections/Testimonials';
+import { Blog } from '@/components/sections/Blog';
+import { ProjectIntake } from '@/components/sections/ProjectIntake';
 
 export default function Home() {
   return (
@@ -14,6 +16,8 @@ export default function Home() {
       <CTACounter />
       <Steps />
       <Testimonials />
+      <Blog />
+      <ProjectIntake />
     </div>
   );
 }

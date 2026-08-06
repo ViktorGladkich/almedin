@@ -78,8 +78,8 @@ export function About() {
       {/* Background Image & Overlay */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
-          alt="Almedin Bau Gebäude"
+          src="/images/about_office.png"
+          alt="About Almedin"
           fill
           className="about-bg object-cover origin-center will-change-transform"
         />

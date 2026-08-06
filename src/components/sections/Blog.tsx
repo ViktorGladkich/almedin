@@ -142,9 +142,9 @@ export function Blog() {
 
               {/* View Button (Follows Mouse on Desktop) */}
               <div className="view-btn hidden lg:flex absolute left-0 top-0 z-20 opacity-0 scale-50 pointer-events-none">
-                <div className="flex items-center gap-2 bg-[#fff31a] text-black px-6 py-3 rounded-xl font-medium shadow-xl whitespace-nowrap">
+                <div className="flex items-center gap-2 bg-[#FF3131] text-white px-6 py-3 rounded-md font-semibold tracking-wide shadow-xl shadow-[#FF3131]/30 whitespace-nowrap">
                   Ansehen
-                  <ArrowUpRight className="w-5 h-5" />
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
                 </div>
               </div>
 

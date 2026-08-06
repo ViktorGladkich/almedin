@@ -13,8 +13,8 @@ if (typeof window !== 'undefined') {
 }
 
 const StarIcon = ({ className = '' }: { className?: string }) => (
-  <svg overflow="visible" viewBox="0 0 64 64" width="24" height="24" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path strokeLinejoin="miter" fill="currentColor" d="m1 32 25 6 6 25 6-25 25-6-25-6-6-25-6 25z"></path>
+  <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" className={className}>
+    <path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" />
   </svg>
 );
 

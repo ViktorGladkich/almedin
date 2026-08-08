@@ -1,82 +1,236 @@
 'use client';
 
-import { useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
+import { useRef, useState, useLayoutEffect, useCallback } from 'react';
 import Image from 'next/image';
+import { gsap, useGSAP, ScrollTrigger, prefersReducedMotion } from '@/lib/gsap';
 
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger, useGSAP);
-}
-
-interface CarouselItem {
+export interface CarouselItem {
   id: number;
   title: string;
   description: string;
   image: string;
+  meta?: { label: string; value: string }[];
 }
 
 interface ScrollCarousel3DProps {
   items: CarouselItem[];
-  radius?: number;
+  /**
+   * Element to pin while the ring turns — normally the section wrapper.
+   * The pin is created HERE, by the same ScrollTrigger that drives the
+   * rotation. Pinning from the parent with a second, separate trigger is what
+   * broke this before: a pinned element stops moving relative to the viewport,
+   * so any trigger attached to something inside it never advances.
+   */
+  pinTarget?: React.RefObject<HTMLElement | null>;
+  /** Scroll distance the pin lasts, in px. Split across all cards. */
+  pinDistance?: number;
+  /** Snap so every card comes to rest facing the viewer. */
+  snap?: boolean;
+  /** Degrees turned across the scroll range. */
+  rotation?: number;
+  /**
+   * Resting angle of the ring, in fractions of one card step.
+   * 0 = one card dead centre. ~0.3 shows a dominant card plus a readable
+   * second one, which reads far better than a single flat-on card.
+   */
+  restOffset?: number;
+  /** Fraction of the stage the rig is allowed to occupy. */
+  fit?: number;
   className?: string;
 }
 
+const PERSPECTIVE = 1400;
+const ASPECT = 0.7; // card width / height
+
+/**
+ * 3D ring carousel driven by scroll.
+ *
+ * TWO THINGS THAT KEEP BREAKING THIS COMPONENT, both the same rule:
+ *
+ * 1. `overflow` other than `visible` forces `transform-style` to compute to
+ *    `flat`. That was the original bug — clipping on the card node collapsed
+ *    the 3D context and backfaces started showing mirrored front content.
+ * 2. `filter` does exactly the same thing. Adding
+ *    `filter: drop-shadow(...)` to the preserve-3d node re-introduced the
+ *    identical bug through a different door.
+ *
+ * So the preserve-3d nodes here carry NO overflow and NO filter. Depth
+ * shadowing is done with `box-shadow` on each face, which does not create a
+ * containing block and leaves the 3D context intact.
+ *
+ * SIZING: card dimensions are derived from the measured stage instead of being
+ * fixed at 280×400. A card at z = +radius is magnified by
+ * `PERSPECTIVE / (PERSPECTIVE - radius)` — about 1.26 at radius 285 — so a
+ * 400px card projects to ~500px and overflows any stage shorter than that.
+ * The fit below solves for the projected size, not the CSS size.
+ */
 export function ScrollCarousel3D({
   items,
-  radius = 600,
+  pinTarget,
+  pinDistance = 1500,
+  snap = true,
+  rotation = 360,
+  restOffset = 0.3,
+  fit = 0.94,
   className = '',
 }: ScrollCarousel3DProps) {
   const sceneRef = useRef<HTMLDivElement>(null);
-  const carouselRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const ringRef = useRef<HTMLDivElement>(null);
+  const [dim, setDim] = useState({ w: 280, h: 400, r: 320 });
+
+  const n = items.length;
+
+  const measure = useCallback(() => {
+    const scene = sceneRef.current;
+    if (!scene || n === 0) return;
+
+    const stageW = scene.clientWidth;
+    const stageH = scene.clientHeight;
+    if (!stageW || !stageH) return;
+
+    // Start from the stage height, then walk the projection back.
+    let h = stageH * fit;
+    let w = h * ASPECT;
+
+    // Minimum radius that keeps adjacent card planes from intersecting,
+    // plus breathing room so the ring reads as a ring.
+    let r = (w / 2 / Math.tan(Math.PI / Math.max(n, 3))) * 1.35;
+
+    // Horizontal extent of the rig is roughly the ring diameter.
+    const maxR = (stageW * fit) / 2;
+    if (r > maxR) {
+      const k = maxR / r;
+      r = maxR;
+      w *= k;
+      h *= k;
+    }
+
+    // Undo the perspective magnification of the front card.
+    const gain = PERSPECTIVE / (PERSPECTIVE - r);
+    h /= gain;
+    w /= gain;
+
+    // Only commit when something actually changed. Every setDim re-runs the
+    // effect, and with revertOnUpdate that kills and rebuilds the pinned
+    // ScrollTrigger — which removes and re-inserts the pin spacer, changing
+    // document height and invalidating every trigger below this section.
+    setDim((prev) => {
+      const next = { w: Math.round(w), h: Math.round(h), r: Math.round(r) };
+      if (prev.w === next.w && prev.h === next.h && prev.r === next.r) return prev;
+      return next;
+    });
+  }, [n, fit]);
+
+  useLayoutEffect(() => {
+    measure();
+    const scene = sceneRef.current;
+    if (!scene) return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(scene);
+    return () => ro.disconnect();
+  }, [measure]);
 
   useGSAP(
     () => {
-      if (!sceneRef.current || !carouselRef.current) return;
+      const scene = sceneRef.current;
+      const ring = ringRef.current;
+      if (!scene || !ring) return;
 
-      const cells = carouselRef.current.children;
-      const angleStep = 360 / cells.length;
+      const cells = Array.from(ring.children) as HTMLElement[];
+      if (!cells.length) return;
 
-      // Position cells in 3D space
-      Array.from(cells).forEach((cell, i) => {
-        const angle = i * angleStep;
+      const step = 360 / cells.length;
+      const rest = -step * restOffset;
+
+      cells.forEach((cell, i) => {
         gsap.set(cell, {
-          transform: `rotateY(${angle}deg) translateZ(${radius}px)`,
+          rotateY: i * step,
+          z: dim.r,
+          transformOrigin: `50% 50% ${-dim.r}px`,
         });
       });
 
-      // Create scroll-driven timeline
-      const triggerElement = sceneRef.current.closest('section') || sceneRef.current;
-      const tl = gsap.timeline({
-        defaults: { ease: 'none' },
-        scrollTrigger: {
-          trigger: triggerElement,
-          start: 'top top',
-          end: '+=1500', // Adjust this to control how long they have to scroll
-          scrub: 1,
-          pin: true,
-        },
-      });
+      if (prefersReducedMotion()) {
+        gsap.set(ring, { rotationY: rest, rotationX: 4 });
+        return;
+      }
 
-      tl.fromTo(carouselRef.current, { rotationY: 0 }, { rotationY: -360 }, 0)
-        .fromTo(
-          carouselRef.current,
-          { rotationZ: 3, rotationX: 3 },
-          { rotationZ: -3, rotationX: -3 },
-          0
-        )
-        .fromTo(
-          cardsRef.current,
-          { rotationZ: 10 },
-          { rotationZ: -10, ease: 'none' },
-          0
-        );
+      gsap.set(ring, { rotationY: rest });
 
-      return () => {
-        tl.kill();
-      };
+      const pinned = pinTarget?.current ?? null;
+      const n = cells.length;
+
+      gsap
+        .timeline({
+          defaults: { ease: 'none' },
+          scrollTrigger: pinned
+            ? {
+                // ONE trigger does both jobs. The pin and the rotation share a
+                // range, so the ring cannot stall while the section is held.
+                trigger: pinned,
+                start: 'top top',
+                end: `+=${pinDistance}`,
+                scrub: 1,
+                pin: pinned,
+                pinSpacing: true,
+                anticipatePin: 1,
+                // Pinning inserts a spacer and changes total document height.
+                // Any trigger below this one computes its start/end against
+                // that height, so this trigger has to refresh first — otherwise
+                // sections further down keep stale positions until the next
+                // resize.
+                refreshPriority: 1,
+                // Each card comes to rest facing front instead of drifting past.
+                // Without this the user has to stop scrolling at exactly the
+                // right pixel to read one.
+                snap: snap
+                  ? { snapTo: 1 / n, duration: 0.35, delay: 0.05, ease: 'power2.inOut' }
+                  : undefined,
+              }
+            : {
+                trigger: scene,
+                start: 'top 75%',
+                end: 'bottom top',
+                scrub: 1,
+              },
+        })
+        .fromTo(ring, { rotationY: rest }, { rotationY: rest - rotation }, 0)
+        .fromTo(ring, { rotationX: 5 }, { rotationX: -5 }, 0);
+
+      // The pin spacer has just been inserted (or re-inserted), so the document
+      // is taller than it was when every trigger below this section computed
+      // its start/end. Without this they keep firing at the old scroll
+      // positions — which is exactly what "the next section scrolls wrong"
+      // looks like. Deferred a frame so the spacer is measured, not predicted.
+      if (pinned) {
+        const id = requestAnimationFrame(() => ScrollTrigger.refresh());
+        return () => cancelAnimationFrame(id);
+      }
+    },
+    {
+      scope: sceneRef,
+      dependencies: [dim.r, dim.w, dim.h, rotation, restOffset, n, pinDistance, snap],
+      // MUST be true. `dim` changes once the stage is measured, and useGSAP
+      // does NOT revert on dependency change by default — the old timeline and
+      // its ScrollTrigger would survive and a second set would be layered on
+      // top, both writing to the same transform every frame.
+      revertOnUpdate: true,
+    }
+  );
+
+  // Entrance lives in its own effect so it plays exactly once, no matter how
+  // many times the stage is re-measured.
+  useGSAP(
+    () => {
+      const ring = ringRef.current;
+      if (!ring || prefersReducedMotion()) return;
+
+      // Only `y` — never `opacity`, and never on the cells.
+      // `opacity` below 1 is a grouping property: like `overflow` and
+      // `filter`, it forces `transform-style` to compute to `flat`. Fading the
+      // 3D cells collapses the ring's depth for the duration of the tween, and
+      // mirrored backfaces show through.
+      gsap.from(ring, { y: 26, duration: 1.2, ease: 'expo.out', delay: 0.45 });
     },
     { scope: sceneRef }
   );
@@ -84,148 +238,205 @@ export function ScrollCarousel3D({
   return (
     <div
       ref={sceneRef}
-      className={`scene relative flex items-center justify-center w-full overflow-visible ${className}`}
-      style={{ perspective: '1200px' }}
+      className={`relative w-full h-full ${className}`}
+      style={{ perspective: `${PERSPECTIVE}px`, perspectiveOrigin: '50% 48%' }}
     >
       <div
-        ref={carouselRef}
-        className="carousel absolute w-[260px] h-[360px] top-1/2 left-1/2 -mt-[180px] -ml-[130px]"
-        style={{ transformStyle: 'preserve-3d', willChange: 'transform' }}
+        ref={ringRef}
+        className="absolute left-1/2 top-1/2"
+        style={{
+          width: dim.w,
+          height: dim.h,
+          marginLeft: -dim.w / 2,
+          marginTop: -dim.h / 2,
+          transformStyle: 'preserve-3d',
+          willChange: 'transform',
+        }}
       >
-        {items.map((item, index) => {
-          // Define styles for each of the 3 cards based on the screenshot
-          const isRed = index === 0;
-          const isBlack = index === 1;
-          const isGray = index === 2;
-
-          const bgColor = isRed ? 'bg-[#FF3131]' : isBlack ? 'bg-black' : 'bg-[#e5e5e5]';
-          const textColor = isRed || isBlack ? 'text-white' : 'text-black';
-          const borderColor = isRed ? 'border-white/30' : isBlack ? 'border-white/20' : 'border-black/10';
-          const starColor = isRed ? 'text-white' : isBlack ? 'text-white/60' : 'text-black/30';
-          const sLabelColor = isRed ? 'text-white/30' : isBlack ? 'text-white/20' : 'text-black/20';
-          const logoColor = isGray ? 'black' : 'white';
-          const logoCross = isRed ? '#FF3131' : isBlack ? 'black' : '#e5e5e5';
-
-          return (
-            <div
-              key={item.id}
-              className="carousel__cell absolute inset-0 w-[280px] h-[400px]"
-              style={{ transformStyle: 'preserve-3d' }}
-            >
-              <div
-                ref={(el) => {
-                  cardsRef.current[index] = el;
-                }}
-                className={`card relative w-full h-full rounded-2xl overflow-hidden shadow-2xl ${bgColor} ${textColor}`}
-                style={{ transformStyle: 'preserve-3d' }}
-              >
-                <div
-                  className="absolute inset-0 w-full h-full flex flex-col p-6"
-                  style={{ backfaceVisibility: 'hidden' }}
-                >
-                  {/* Decorative Border */}
-                  <div className={`absolute inset-3 border ${borderColor} rounded-sm pointer-events-none`} />
-
-                  {/* 4 Stars at corners */}
-                  <div className="absolute inset-3 pointer-events-none">
-                    {/* Top Left */}
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className={`absolute -top-1.5 -left-1.5 ${starColor}`}>
-                      <path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" />
-                    </svg>
-                    {/* Top Right */}
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className={`absolute -top-1.5 -right-1.5 ${starColor}`}>
-                      <path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" />
-                    </svg>
-                    {/* Bottom Left */}
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className={`absolute -bottom-1.5 -left-1.5 ${starColor}`}>
-                      <path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" />
-                    </svg>
-                    {/* Bottom Right */}
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className={`absolute -bottom-1.5 -right-1.5 ${starColor}`}>
-                      <path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" />
-                    </svg>
-                  </div>
-
-                  {/* Header */}
-                  <div className="flex justify-between items-start z-10 pt-2 px-2">
-                    <h3 className="text-[17px] font-medium leading-tight max-w-[120px]">
-                      {item.title}
-                    </h3>
-                    <span className={`text-4xl font-light tracking-tighter ${sLabelColor}`}>
-                      S{index + 1}
-                    </span>
-                  </div>
-
-                  {/* Center Image Mask */}
-                  <div className="flex-1 flex items-center justify-center relative z-10 w-full">
-                    {isRed && (
-                      <div 
-                        className="w-[180px] h-[180px] bg-black relative"
-                        style={{
-                          maskImage: 'radial-gradient(circle at 35% 50%, black 40%, transparent 40.5%), radial-gradient(circle at 65% 50%, black 40%, transparent 40.5%)',
-                          maskComposite: 'add',
-                          WebkitMaskImage: 'radial-gradient(circle at 35% 50%, black 40%, transparent 40.5%), radial-gradient(circle at 65% 50%, black 40%, transparent 40.5%)',
-                          WebkitMaskComposite: 'source-over',
-                        }}
-                      >
-                        <Image src={item.image} alt={item.title} fill className="object-cover" />
-                      </div>
-                    )}
-                    
-                    {isBlack && (
-                      <div 
-                        className="w-[160px] h-[160px] relative overflow-hidden bg-white"
-                        style={{ clipPath: 'circle(50% at 50% 50%)' }}
-                      >
-                        <Image src={item.image} alt={item.title} fill className="object-cover" />
-                      </div>
-                    )}
-
-                    {isGray && (
-                      <div className="w-[170px] h-[170px] relative flex items-center justify-center">
-                        {/* Red Pentagon Background/Border */}
-                        <div 
-                          className="absolute inset-0 bg-[#FF3131]"
-                          style={{ clipPath: 'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)' }}
-                        />
-                        {/* Image Pentagon */}
-                        <div 
-                          className="absolute inset-1 bg-gray-200"
-                          style={{ clipPath: 'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)' }}
-                        >
-                          <Image src={item.image} alt={item.title} fill className="object-cover" />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Bottom Logo */}
-                  <div className="absolute bottom-6 left-6 z-10 w-6 h-6">
-                    <Image 
-                      src="/logo.png" 
-                      alt="Logo" 
-                      fill 
-                      className={`object-contain ${isRed || isBlack ? 'brightness-0 invert' : ''}`}
-                      sizes="24px"
-                    />
-                  </div>
-
-                </div>
-                
-                {/* Back Face */}
-                <div
-                  className="absolute inset-0 w-full h-full"
-                  style={{ 
-                    backfaceVisibility: 'hidden', 
-                    transform: 'rotateY(180deg)',
-                    backgroundColor: isRed ? '#FF3131' : isBlack ? 'black' : '#e5e5e5',
-                  }}
-                />
-              </div>
-            </div>
-          );
-        })}
+        {items.map((item, index) => (
+          <Card key={item.id} item={item} index={index} height={dim.h} />
+        ))}
       </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+
+const PALETTES = [
+  { bg: '#FF3131', ink: '#FFFFFF', hair: 'rgba(255,255,255,0.34)', ghost: 'rgba(255,255,255,0.30)', logoColor: '#FFFFFF' },
+  { bg: '#0D0D0D', ink: '#F2F0EC', hair: 'rgba(242,240,236,0.20)', ghost: 'rgba(242,240,236,0.20)', logoColor: '#FF3131' },
+  { bg: '#E6E4DD', ink: '#0D0D0D', hair: 'rgba(13,13,13,0.14)', ghost: 'rgba(13,13,13,0.20)', logoColor: '#0D0D0D' },
+  { bg: '#3A3A38', ink: '#F2F0EC', hair: 'rgba(242,240,236,0.20)', ghost: 'rgba(242,240,236,0.20)', logoColor: '#F2F0EC' },
+];
+
+const CLIPS = [
+  'circle(50% at 50% 50%)',
+  'polygon(50% 0%, 100% 26%, 100% 74%, 50% 100%, 0% 74%, 0% 26%)',
+  'polygon(0% 0%, 100% 0%, 100% 78%, 50% 100%, 0% 78%)',
+  'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
+];
+
+function Card({
+  item,
+  index,
+  height,
+}: {
+  item: CarouselItem;
+  index: number;
+  height: number;
+}) {
+  const p = PALETTES[index % PALETTES.length];
+  const clip = CLIPS[index % CLIPS.length];
+
+  // Type and padding scale with the card so the layout holds at any stage size.
+  const u = height / 400;
+  const px = (v: number) => `${Math.round(v * u)}px`;
+
+  return (
+    <div className="absolute inset-0" style={{ transformStyle: 'preserve-3d' }}>
+      {/* No overflow, no filter — this node IS the 3D context. */}
+      <div className="relative w-full h-full" style={{ transformStyle: 'preserve-3d' }}>
+        <Face palette={p} pad={px(24)}>
+          <div className="flex justify-between items-start gap-3">
+            <h3
+              className="font-medium leading-[1.15] tracking-tight m-0"
+              style={{ fontSize: px(17), maxWidth: px(150) }}
+            >
+              {item.title}
+            </h3>
+            <div
+              className="shrink-0"
+              style={{
+                width: px(28),
+                height: px(28),
+                backgroundColor: p.logoColor || p.ink,
+                WebkitMask: "url('/logo.png') no-repeat center / contain",
+                mask: "url('/logo.png') no-repeat center / contain",
+              }}
+              aria-hidden
+            />
+          </div>
+
+          <div className="flex-1 grid place-items-center" style={{ padding: `${px(14)} 0` }}>
+            <div
+              className="relative"
+              style={{ width: px(164), height: px(164), clipPath: clip }}
+            >
+              <Image src={item.image} alt={item.title} fill sizes="220px" className="object-cover" />
+            </div>
+          </div>
+
+          <p className="leading-[1.45] opacity-70 m-0" style={{ fontSize: px(11) }}>
+            {item.description}
+          </p>
+        </Face>
+
+        <Face palette={p} pad={px(24)} rotated>
+          <div className="flex justify-between items-start">
+            <span
+              className="font-mono uppercase tracking-[0.28em]"
+              style={{ fontSize: px(10), color: p.ghost }}
+            >
+              Rückseite
+            </span>
+            <div
+              className="shrink-0"
+              style={{
+                width: px(28),
+                height: px(28),
+                backgroundColor: p.logoColor || p.ink,
+                WebkitMask: "url('/logo.png') no-repeat center / contain",
+                mask: "url('/logo.png') no-repeat center / contain",
+              }}
+              aria-hidden
+            />
+          </div>
+
+          <div className="flex-1 flex flex-col justify-center">
+            {(
+              item.meta ?? [
+                { label: 'Leistung', value: item.title },
+                { label: 'Region', value: 'Dresden / Sachsen' },
+              ]
+            ).map((row) => (
+              <div
+                key={row.label}
+                className="flex justify-between items-baseline gap-3"
+                style={{ padding: `${px(10)} 0`, borderTop: `1px solid ${p.hair}` }}
+              >
+                <span
+                  className="font-mono uppercase tracking-[0.2em] opacity-60"
+                  style={{ fontSize: px(9) }}
+                >
+                  {row.label}
+                </span>
+                <span className="text-right leading-snug" style={{ fontSize: px(12) }}>
+                  {row.value}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <span
+            className="font-mono uppercase tracking-[0.24em] opacity-50"
+            style={{ fontSize: px(9) }}
+          >
+            Almedin Bau
+          </span>
+        </Face>
+      </div>
+    </div>
+  );
+}
+
+function Face({
+  palette,
+  children,
+  pad,
+  rotated = false,
+}: {
+  palette: (typeof PALETTES)[number];
+  children: React.ReactNode;
+  pad: string;
+  rotated?: boolean;
+}) {
+  return (
+    <div
+      className="absolute inset-0 flex flex-col rounded-none overflow-hidden"
+      style={{
+        padding: pad,
+        background: palette.bg,
+        color: palette.ink,
+        backfaceVisibility: 'hidden',
+        WebkitBackfaceVisibility: 'hidden',
+        transform: rotated ? 'rotateY(180deg)' : undefined,
+        // box-shadow, NOT filter: drop-shadow. A filter would flatten the
+        // parent's 3D context and the mirrored-backface bug comes straight back.
+        boxShadow: '0 30px 60px -20px rgba(13,13,13,0.45)',
+      }}
+    >
+      <div
+        className="absolute rounded-none pointer-events-none"
+        style={{ inset: '12px', border: `1px solid ${palette.hair}` }}
+      />
+      <div className="absolute pointer-events-none z-20" style={{ inset: '12px', color: palette.ghost }}>
+        {(
+          ['-top-[6px] -left-[6px]', '-top-[6px] -right-[6px]', '-bottom-[6px] -left-[6px]', '-bottom-[6px] -right-[6px]'] as const
+        ).map((pos) => (
+          <svg
+            key={pos}
+            className={`absolute ${pos}`}
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" />
+          </svg>
+        ))}
+      </div>
+      <div className="relative z-10 flex flex-col h-full">{children}</div>
     </div>
   );
 }

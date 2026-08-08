@@ -1,0 +1,73 @@
+--- src/components/sections/HeroKnockout.tsx
++++ src/components/sections/HeroKnockout.tsx
+@@ -8,3 +8,3 @@
+ 
+-const WORD = 'BAU-EXZELLENZ';
+-const BASE = '#F2F0EC'; // page cream — must match the section background exactly
++const WORD = 'ALMEDIN BAU';
++const BASE = '#fffcf4'; // page cream — must match the section background exactly
+ 
+@@ -82,3 +82,3 @@
+           '.hk-word',
+-          { scale: 0.86, opacity: 0, transformOrigin: '50% 50%' },
++          { scale: 0.5, opacity: 0, transformOrigin: '50% 50%' },
+           { scale: 1, opacity: 1, duration: 1.6, ease: 'expo.out' }
+@@ -112,6 +112,6 @@
+           })
+-          .to('.hk-word', { scale: 9, ease: 'power2.in' }, 0)
++          .to('.hk-word-scroll', { scale: 9, ease: 'power2.in' }, 0)
+           .to('.hk-plate', { opacity: 0, ease: 'power2.in', duration: 0.35 }, 0.62)
+-          .to('.hk-video', { scale: 1, ease: 'none' }, 0)
+-          .to('.hk-fade', { opacity: 0, y: -20, ease: 'power2.in', duration: 0.3 }, 0)
++          .to('.hk-video-scroll', { scale: 1/1.1, ease: 'none' }, 0)
++          .to('.hk-fade-scroll', { opacity: 0, y: -20, ease: 'power2.in', duration: 0.3 }, 0)
+           .to('.hk-margins', { opacity: 0, ease: 'none', duration: 0.3 }, 0);
+@@ -131,12 +131,14 @@
+       {/* LAYER 1 — footage */}
+-      <video
+-        className="hk-video absolute inset-0 w-full h-full object-cover will-change-transform"
+-        src={videoSrc}
+-        poster={posterSrc}
+-        autoPlay
+-        muted
+-        loop
+-        playsInline
+-        preload="metadata"
+-        aria-hidden
+-      />
++      <div className="hk-video-scroll absolute inset-0 w-full h-full transform-origin-center">
++        <video
++          className="hk-video absolute inset-0 w-full h-full object-cover will-change-transform"
++          src={videoSrc}
++          poster={posterSrc}
++          autoPlay
++          muted
++          loop
++          playsInline
++          preload="metadata"
++          aria-hidden
++        />
++      </div>
+ 
+@@ -156,3 +158,4 @@
+             <rect x="0" y="0" width={box.w} height={box.h} fill="#fff" />
+-            <g className="hk-word" style={{ transformOrigin: '50% 50%' }}>
+-              <text
++            <g className="hk-word-scroll" style={{ transformOrigin: '50% 50%' }}>
++              <g className="hk-word" style={{ transformOrigin: '50% 50%' }}>
++                <text
+@@ -173,2 +176,3 @@
+                 </text>
++              </g>
+             </g>
+@@ -188,3 +192,4 @@
+ 
+-      <div className="relative z-10 h-full max-w-[1400px] mx-auto px-6 flex flex-col justify-between pt-32 pb-10 pointer-events-none">
+-        <div className="hk-fade flex flex-col md:flex-row justify-between items-center w-full uppercase tracking-[0.22em] text-[10px] md:text-[11px] text-[#4D4C49]">
++      <div className="hk-fade-scroll relative z-10 h-full max-w-[1400px] mx-auto px-6 flex flex-col justify-between pt-32 pb-10 pointer-events-none">
++        <div className="hk-fade flex flex-col md:flex-row justify-between items-center w-full uppercase tracking-[0.15em] text-[10px] md:text-[11px] text-[#4D4C49]">
+           <RevealText text="Von der Grundsteinlegung" immediate delay={0.5} />
+@@ -216,2 +221,3 @@
+       </div>
++
+     </section>

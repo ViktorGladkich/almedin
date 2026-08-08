@@ -51,7 +51,7 @@ export function Hero() {
 
         {/* The 3 Services Cards -> We use the ScrollCarousel3D */}
         <div className="w-full xl:w-2/3 h-[500px]">
-          <ScrollCarousel3D items={SERVICES_CAROUSEL} radius={200} />
+          <ScrollCarousel3D items={SERVICES_CAROUSEL} fit={0.8} />
         </div>
 
         <div className="hidden xl:block text-neutral-400 font-mono text-sm text-right">

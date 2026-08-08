@@ -1,42 +1,90 @@
 @import url('https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,300,400&f[]=clash-display@200,400,700,500,600,300&display=swap');
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------------------
+   RAW TOKENS
+   These are plain custom properties, not Tailwind theme values, because
+   ThemeScroll rewrites them at runtime on <html>. Anything Tailwind compiles
+   to a literal colour could not be animated.
+--------------------------------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Page frame width. ONE source of truth — PageFrame paints it, every
+     section pads by it. Never write 30px anywhere else. */
+  --frame: 14px;
+
+  /* Polarity. ThemeScroll interpolates these between light and dark. */
+  --page-bg:      #F2F0EC;
+  --page-ink:     #0D0D0D;
+  --page-muted:   rgba(13, 13, 13, 0.55);
+  --page-hair:    rgba(13, 13, 13, 0.14);
+  --page-surface: #E6E4DD;
+  --frame-color:  #F2F0EC;
+
+  /* The accent never shifts with the theme. An accent that follows the
+     lighting stops reading as the brand colour. */
+  --accent: #FF3131;
 }
 
+@media (min-width: 768px) {
+  :root { --frame: 30px; }
+}
+
+/* ---------------------------------------------------------------------------
+   TAILWIND THEME
+   `inline` means the utility emits `var(--page-ink)` rather than the value it
+   resolves to right now — which is what makes bg-page-bg follow ThemeScroll.
+   Gives us: bg-page-bg, text-page-ink, border-page-hair, p-frame, top-frame…
+--------------------------------------------------------------------------- */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: 'Satoshi', sans-serif;
   --font-display: 'Clash Display', sans-serif;
+
+  --color-page-bg:      var(--page-bg);
+  --color-page-ink:     var(--page-ink);
+  --color-page-muted:   var(--page-muted);
+  --color-page-hair:    var(--page-hair);
+  --color-page-surface: var(--page-surface);
+  --color-frame:        var(--frame-color);
+  --color-accent:       var(--accent);
+
+  --spacing-frame: var(--frame);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ---------------------------------------------------------------------------
+   BASE
+--------------------------------------------------------------------------- */
+html {
+  /* The background belongs here, not on each section: during a polarity scrub
+     only ONE layer then has to repaint instead of one per section. */
+  background: var(--page-bg);
+  color: var(--page-ink);
+
+  /* Must stay `auto`. `scroll-behavior: smooth` fights Lenis — both animate
+     the same scroll position and anchor links stutter. */
+  scroll-behavior: auto;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
   font-family: var(--font-sans);
 }
 
+/* No prefers-color-scheme block: polarity is driven by ThemeScroll per
+   section, so an OS-level override would fight it. */
+
+/* ---------------------------------------------------------------------------
+   FILM GRAIN
+--------------------------------------------------------------------------- */
 @keyframes noise-animation {
-  0% { transform: translate(0, 0); }
-  10% { transform: translate(-5%, -5%); }
-  20% { transform: translate(-10%, 5%); }
-  30% { transform: translate(5%, -10%); }
-  40% { transform: translate(-5%, 15%); }
-  50% { transform: translate(-10%, 5%); }
-  60% { transform: translate(15%, 0); }
-  70% { transform: translate(0, 15%); }
-  80% { transform: translate(3%, 20%); }
-  90% { transform: translate(-10%, 10%); }
+  0%   { transform: translate(0, 0); }
+  10%  { transform: translate(-5%, -5%); }
+  20%  { transform: translate(-10%, 5%); }
+  30%  { transform: translate(5%, -10%); }
+  40%  { transform: translate(-5%, 15%); }
+  50%  { transform: translate(-10%, 5%); }
+  60%  { transform: translate(15%, 0); }
+  70%  { transform: translate(0, 15%); }
+  80%  { transform: translate(3%, 20%); }
+  90%  { transform: translate(-10%, 10%); }
   100% { transform: translate(0, 0); }
 }
 
@@ -52,10 +100,33 @@ body {
   background-repeat: repeat;
   background-size: 150px 150px;
   opacity: 0.06;
+  /* overlay keeps blacks black and creams warm. A plain grey plate on top
+     would just wash the page out. */
+  mix-blend-mode: overlay;
   animation: noise-animation 0.4s steps(2) infinite;
+  will-change: transform;
 }
 
-/* Unreveal Effects Specific Styles */
+/* ---------------------------------------------------------------------------
+   PAGE FRAME
+--------------------------------------------------------------------------- */
+.page-frame {
+  position: fixed;
+  inset: 0;
+  z-index: 60; /* content < 60 frame < 70 header < 80+ modals */
+  pointer-events: none;
+}
+.pf-edge { position: absolute; background: var(--frame-color); }
+.pf-top, .pf-bottom { left: 0; right: 0; height: var(--frame); }
+.pf-top { top: 0; }
+.pf-bottom { bottom: 0; }
+.pf-left, .pf-right { top: 0; bottom: 0; width: var(--frame); }
+.pf-left { left: 0; }
+.pf-right { right: 0; }
+
+/* ---------------------------------------------------------------------------
+   PROJECT PREVIEW GRID
+--------------------------------------------------------------------------- */
 .preview-item-grid {
   display: grid;
   grid-template-columns: 100%;
@@ -67,10 +138,23 @@ body {
   .preview-item-grid {
     grid-template-columns: 30% 1fr 30%;
     grid-template-rows: 1fr auto auto auto;
-    grid-template-areas: 
+    grid-template-areas:
       'title title title'
       'box-left subtitle box-right'
       'box-left meta box-right'
       'box-left ... box-right';
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   MOTION
+--------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .noise-overlay { animation: none; will-change: auto; }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

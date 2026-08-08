@@ -6,6 +6,7 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { RevealText3D } from '@/components/animations/RevealText3D';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -152,9 +153,14 @@ export function Testimonials() {
                 alt="5 Sterne" 
                 className="mb-8"
               />
-              <h3 className="text-[#fffcf4] text-[24px] md:text-[32px] lg:text-[36px] font-medium leading-[1.3] tracking-tight">
-                {testimonials[currentIndex].text}
-              </h3>
+              <RevealText3D 
+                key={testimonials[currentIndex].id}
+                text={testimonials[currentIndex].text}
+                tag="h3"
+                scrub={false}
+                triggerOnScroll={true}
+                className="text-[#fffcf4] text-[24px] md:text-[32px] lg:text-[36px] font-medium leading-[1.3] tracking-tight"
+              />
             </div>
           </div>
 

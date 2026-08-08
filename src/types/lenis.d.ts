@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 declare module 'lenis' {
   export interface LenisOptions {
     duration?: number;
@@ -10,7 +11,7 @@ declare module 'lenis' {
     infinite?: boolean;
     wrapper?: HTMLElement | Window;
     content?: HTMLElement;
-    [key: string]: any;
+    [key: string]: unknown;
   }
 
   export default class Lenis {
@@ -19,8 +20,8 @@ declare module 'lenis' {
     start(): void;
     stop(): void;
     destroy(): void;
-    on(event: string, callback: (...args: any[]) => void): void;
-    off(event: string, callback: (...args: any[]) => void): void;
+    on(event: string, callback: (...args: unknown[]) => void): void;
+    off(event: string, callback: (...args: unknown[]) => void): void;
     scroll: number;
     limit: number;
     velocity: number;

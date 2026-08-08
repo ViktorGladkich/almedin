@@ -123,12 +123,12 @@ export function Blog() {
   return (
     <section
       ref={sectionRef}
-      className="w-full py-28 md:py-32 max-w-[1400px] mx-auto overflow-hidden"
+      className="w-full py-16 sm:py-24 md:py-32 max-w-[1400px] mx-auto overflow-hidden"
       style={{ paddingInline: 'var(--frame)' }}
     >
-      <div className="w-full flex flex-col gap-10 md:gap-12">
+      <div className="w-full flex flex-col gap-8 sm:gap-10 md:gap-12">
         <h2
-          className="text-3xl md:text-4xl font-display font-medium m-0"
+          className="text-2xl sm:text-3xl md:text-4xl font-display font-medium m-0"
           style={{ color: 'var(--page-ink)' }}
         >
           Feldnotizen
@@ -139,42 +139,34 @@ export function Blog() {
             <Link
               key={post.id}
               href={post.href}
-              className="blog-item group relative flex flex-col lg:flex-row items-center justify-between py-9 lg:py-12"
+              className="blog-item group relative flex flex-col lg:flex-row items-start lg:items-center justify-between py-6 sm:py-8 lg:py-12"
               style={{ borderBottom: '1px solid var(--page-hair)' }}
             >
               {/* Left */}
-              <div className="flex flex-col flex-1 gap-3 pr-0 lg:pr-12 w-full lg:w-auto z-10 pointer-events-none">
+              <div className="flex flex-col flex-1 gap-2.5 sm:gap-3 pr-0 lg:pr-12 w-full lg:w-auto z-10 pointer-events-none">
                 <h3
-                  className="text-2xl md:text-4xl lg:text-[52px] leading-[1.08] tracking-tight font-display m-0 transition-opacity duration-500 group-hover:opacity-60"
+                  className="text-xl sm:text-3xl md:text-4xl lg:text-[52px] leading-[1.12] sm:leading-[1.08] tracking-tight font-display m-0 transition-opacity duration-500 group-hover:opacity-60"
                   style={{ color: 'var(--page-ink)' }}
                 >
                   {post.title}
                 </h3>
 
                 <div
-                  className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-4 font-mono text-[10px] tracking-[0.22em] uppercase"
+                  className="flex flex-row items-center gap-2.5 sm:gap-4 font-mono text-[9.5px] sm:text-[10px] tracking-[0.18em] sm:tracking-[0.22em] uppercase"
                   style={{ color: 'var(--page-muted)' }}
                 >
                   <time dateTime={post.dateTime}>{post.date}</time>
                   <span
-                    className="hidden sm:block w-1 h-1 rounded-full"
+                    className="w-1 h-1 rounded-full"
                     style={{ background: 'var(--page-hair)' }}
                   />
                   <span>{post.category}</span>
                 </div>
               </div>
 
-              {/*
-                Right image.
-                perspective lives on the OUTER element; the rotation lives on the
-                inner one. The previous version had both on the same node, where
-                perspective simply does not apply — so the "3D tilt" was a flat
-                skew with no depth at all.
-                overflow/rounding also stay out here: clipping on a transformed
-                node flattens its 3D context.
-              */}
+              {/* Right image */}
               <div
-                className="w-full lg:w-[440px] shrink-0 mt-7 lg:mt-0 relative overflow-hidden rounded-xl aspect-[1.5/1] z-10 pointer-events-none"
+                className="w-full lg:w-[440px] shrink-0 mt-5 lg:mt-0 relative overflow-hidden rounded-lg sm:rounded-xl aspect-[1.7/1] sm:aspect-[1.5/1] z-10 pointer-events-none"
                 style={{ perspective: '1000px', background: 'var(--page-surface)' }}
               >
                 <div className="blog-tilt w-full h-full will-change-transform">
@@ -182,9 +174,9 @@ export function Blog() {
                 </div>
               </div>
 
-              {/* Touch affordance — the hover button never appears on mobile */}
+              {/* Touch affordance — arrow indicator */}
               <span
-                className="lg:hidden absolute right-0 top-9 pointer-events-none"
+                className="lg:hidden absolute right-0 top-6 sm:top-8 pointer-events-none"
                 style={{ color: 'var(--page-muted)' }}
                 aria-hidden
               >

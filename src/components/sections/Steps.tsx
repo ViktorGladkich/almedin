@@ -15,7 +15,7 @@ const steps = [
     title: 'Grundlagenermittlung',
     desc: 'Detaillierte Definition der Projektziele, Standortanforderungen und strategischen Bauvorgaben.',
     bgClass: 'bg-black text-[#fffcf4]',
-    numClass: 'text-[#4d4c49]',
+    numClass: 'text-neutral-500',
   },
   {
     num: '02',
@@ -43,7 +43,7 @@ const steps = [
 
 function StepCard({ step }: { step: typeof steps[0] }) {
   return (
-    <div className={`step-card-animate opacity-0 relative w-full rounded-[10px] p-8 md:p-10 flex flex-col items-center text-center overflow-hidden h-full min-h-[360px] md:min-h-[380px] justify-between ${step.bgClass}`}>
+    <div className={`step-card-animate opacity-0 relative w-full rounded-[10px] p-5 sm:p-8 md:p-10 flex flex-col items-center text-center overflow-hidden h-full min-h-[260px] sm:min-h-[320px] md:min-h-[380px] justify-between ${step.bgClass}`}>
       {/* Background Image for Step 04 */}
       {step.image && (
         <>
@@ -58,18 +58,18 @@ function StepCard({ step }: { step: typeof steps[0] }) {
       )}
 
       {/* Number at Top */}
-      <div className="relative z-20 flex w-full justify-center pt-2">
-        <h2 className={`text-[32px] md:text-[40px] leading-none font-display font-medium ${step.numClass}`}>
+      <div className="relative z-20 flex w-full justify-center pt-1.5 sm:pt-2">
+        <h2 className={`text-[28px] sm:text-[32px] md:text-[40px] leading-none font-display font-medium ${step.numClass}`}>
           {step.num}
         </h2>
       </div>
       
       {/* Text at Bottom */}
-      <div className="relative z-20 flex flex-col items-center w-full pb-2">
-        <h3 className="text-xl md:text-2xl font-display font-medium mb-3">
+      <div className="relative z-20 flex flex-col items-center w-full pb-1.5 sm:pb-2">
+        <h3 className="text-lg sm:text-xl md:text-2xl font-display font-medium mb-2 sm:mb-3">
           {step.title}
         </h3>
-        <p className="text-[14px] md:text-[15px] leading-relaxed font-light opacity-80 max-w-[280px]">
+        <p className="text-[13px] sm:text-[14px] md:text-[15px] leading-relaxed font-light opacity-80 max-w-[260px] sm:max-w-[280px]">
           {step.desc}
         </p>
       </div>
@@ -84,7 +84,7 @@ export function Steps() {
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: 'top 40%',
+        start: 'top 75%',
         end: 'bottom bottom',
         toggleActions: 'play none none reverse',
       }
@@ -112,7 +112,7 @@ export function Steps() {
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} className="relative w-full flex flex-col items-center pt-[200px] overflow-hidden z-10">
+    <section ref={sectionRef} className="relative w-full flex flex-col items-center pt-16 sm:pt-[140px] md:pt-[200px] overflow-hidden z-10">
       {/* Background Image & Overlay */}
       <div className="absolute inset-0 z-0">
         <Image 
@@ -124,14 +124,13 @@ export function Steps() {
         />
         {/* Base overlay */}
         <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
-        {/* Dark gradient from top */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-black/60 to-transparent" />
+        {/* Dark gradient from top — soft on mobile so Card 01 remains fully visible */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 md:from-black via-black/30 md:via-black/60 to-transparent" />
       </div>
 
-      {/* Grid and Cards Wrapper with top fade mask */}
+      {/* Grid and Cards Wrapper with soft 50px top fade mask on mobile and 300px on desktop */}
       <div 
-        className="grid-wrapper opacity-0 relative z-10 w-full flex flex-col items-center"
-        style={{ maskImage: 'linear-gradient(to bottom, transparent 0px, black 300px)', WebkitMaskImage: 'linear-gradient(to bottom, transparent 0px, black 300px)' }}
+        className="grid-wrapper opacity-0 relative z-10 w-full flex flex-col items-center [mask-image:linear-gradient(to_bottom,transparent_0px,black_50px)] md:[mask-image:linear-gradient(to_bottom,transparent_0px,black_300px)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0px,black_50px)] md:[-webkit-mask-image:linear-gradient(to_bottom,transparent_0px,black_300px)]"
       >
         
         {/* Row 1: Empty (3 columns, hidden on mobile) */}
@@ -148,14 +147,14 @@ export function Steps() {
 
         {/* Row 2: Top (01 and 02) */}
         <div className="w-full flex justify-center border-b border-white/10">
-          <div className="w-full max-w-[1150px] relative px-6 md:px-0">
+          <div className="w-full max-w-[1150px] relative px-3.5 sm:px-6 md:px-0">
             <RowTopStars />
             <div className="grid grid-cols-1 md:grid-cols-3 border-x border-white/10 w-full h-full">
-              <div className="p-6 md:p-8 border-b md:border-b-0 md:border-r border-white/10">
+              <div className="p-3.5 sm:p-6 md:p-8 border-b md:border-b-0 md:border-r border-white/10">
                 <StepCard step={steps[0]} />
               </div>
               <div className="hidden md:block border-r border-white/10"></div>
-              <div className="p-6 md:p-8">
+              <div className="p-3.5 sm:p-6 md:p-8">
                 <StepCard step={steps[1]} />
               </div>
             </div>
@@ -164,11 +163,11 @@ export function Steps() {
 
         {/* Row 3: Middle (03) */}
         <div className="w-full flex justify-center border-b border-white/10">
-          <div className="w-full max-w-[1150px] relative px-6 md:px-0">
+          <div className="w-full max-w-[1150px] relative px-3.5 sm:px-6 md:px-0">
             <RowTopStars />
             <div className="grid grid-cols-1 md:grid-cols-3 border-x border-white/10 w-full h-full">
               <div className="hidden md:block border-r border-white/10"></div>
-              <div className="p-6 md:p-8 border-b md:border-b-0 md:border-r border-white/10">
+              <div className="p-3.5 sm:p-6 md:p-8 border-b md:border-b-0 md:border-r border-white/10">
                 <StepCard step={steps[2]} />
               </div>
               <div className="hidden md:block"></div>
@@ -178,18 +177,18 @@ export function Steps() {
 
         {/* Row 4: Bottom (04 and Get Started) */}
         <div className="w-full flex justify-center border-b border-white/10">
-          <div className="w-full max-w-[1150px] relative px-6 md:px-0">
+          <div className="w-full max-w-[1150px] relative px-3.5 sm:px-6 md:px-0">
             <RowTopStars />
             <RowBottomStars />
             <div className="grid grid-cols-1 md:grid-cols-3 border-x border-white/10 w-full h-full">
-              <div className="p-6 md:p-8 border-b md:border-b-0 md:border-r border-white/10">
+              <div className="p-3.5 sm:p-6 md:p-8 border-b md:border-b-0 md:border-r border-white/10">
                 <StepCard step={steps[3]} />
               </div>
               <div className="hidden md:block border-r border-white/10"></div>
               {/* Get Started Button container sits at the bottom */}
-              <div className="p-6 md:p-8 flex items-end justify-center">
-                <div className="step-card-animate opacity-0 relative w-full rounded-[10px] p-[60px] flex flex-col items-center justify-center text-center overflow-hidden h-max bg-[#fffcf4]/10 backdrop-blur-[20px]">
-                  <CTAButton text="JETZT STARTEN" href="/contact" />
+              <div className="p-3.5 sm:p-6 md:p-8 flex items-end justify-center">
+                <div className="step-card-animate opacity-0 relative w-full rounded-[10px] p-6 sm:p-[40px] md:p-[60px] flex flex-col items-center justify-center text-center overflow-hidden h-max bg-[#fffcf4]/10 backdrop-blur-[20px]">
+                  <CTAButton text="JETZT STARTEN" href="/contact" size="responsive" />
                 </div>
               </div>
             </div>

@@ -102,7 +102,7 @@ export function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-3 border-x border-black/15 w-full h-full">
             
             {/* Column 1 */}
-            <div className="footer-grid-col opacity-0 p-8 md:p-12 xl:p-16 border-b md:border-b-0 md:border-r border-black/15 flex flex-col gap-12 md:gap-16">
+            <div className="footer-grid-col opacity-0 p-6 sm:p-8 md:p-12 xl:p-16 border-b md:border-b-0 md:border-r border-black/15 grid grid-cols-2 md:flex md:flex-col gap-8 md:gap-16">
               {/* DIENSTLEISTUNGEN */}
               <div className="flex flex-col gap-4">
                 <span className="text-[10px] text-neutral-400 uppercase tracking-widest">Dienstleistungen</span>
@@ -137,7 +137,7 @@ export function Footer() {
             </div>
 
             {/* Column 2 */}
-            <div className="footer-grid-col opacity-0 p-8 md:p-12 xl:p-16 border-b md:border-b-0 md:border-r border-black/15 flex flex-col gap-12 md:gap-16">
+            <div className="footer-grid-col opacity-0 p-6 sm:p-8 md:p-12 xl:p-16 border-b md:border-b-0 md:border-r border-black/15 flex flex-col gap-8 md:gap-16">
               {/* KONTAKT */}
               <div className="flex flex-col gap-4">
                 <span className="text-[10px] text-neutral-400 uppercase tracking-widest">Kontakt</span>
@@ -154,7 +154,7 @@ export function Footer() {
               {/* SOCIALS */}
               <div className="flex flex-col gap-4">
                 <span className="text-[10px] text-neutral-400 uppercase tracking-widest">Socials</span>
-                <div className="flex flex-col items-start gap-3 text-base md:text-lg lg:text-xl font-medium">
+                <div className="flex flex-row md:flex-col items-start gap-6 md:gap-3 text-base md:text-lg lg:text-xl font-medium">
                   <a href="#" className="group flex overflow-hidden w-fit">
                     <HoverSlideText text="Instagram" className="h-[1.2em]" />
                   </a>
@@ -166,7 +166,7 @@ export function Footer() {
             </div>
 
             {/* Column 3 */}
-            <div className="footer-grid-col opacity-0 p-8 md:p-12 xl:p-16 flex flex-col justify-between gap-12">
+            <div className="footer-grid-col opacity-0 p-6 sm:p-8 md:p-12 xl:p-16 flex flex-col justify-between gap-8 md:gap-12">
               {/* STANDORT */}
               <div className="flex flex-col gap-4">
                 <span className="text-[10px] text-neutral-400 uppercase tracking-widest">Standort</span>
@@ -176,7 +176,7 @@ export function Footer() {
               </div>
 
               <div className="flex justify-start">
-                <CTAButton text="Kostenlose Beratung" href="/contact" />
+                <CTAButton text="Kostenlose Beratung" href="/contact" size="responsive" />
               </div>
             </div>
 
@@ -209,8 +209,8 @@ export function Footer() {
           <StarIcon />
         </div>
 
-        <h2 className="text-[13vw] xl:text-[12vw] font-display font-medium leading-none tracking-tighter text-black uppercase w-full text-center flex items-center justify-center gap-[2vw] md:gap-[1.5vw] overflow-hidden px-4 md:px-8">
-          <div className="footer-letter opacity-0 translate-y-[120%] relative w-[12vw] h-[12vw] xl:w-[10vw] xl:h-[10vw] flex-shrink-0">
+        <h2 className="text-[10.5vw] sm:text-[11.5vw] md:text-[12vw] xl:text-[12vw] font-display font-medium leading-none tracking-tighter text-black uppercase w-full text-center flex items-center justify-center gap-[2vw] md:gap-[1.5vw] overflow-hidden px-1 sm:px-4 md:px-8">
+          <div className="footer-letter opacity-0 translate-y-[120%] relative w-[9.5vw] h-[9.5vw] sm:w-[10vw] sm:h-[10vw] xl:w-[10vw] xl:h-[10vw] flex-shrink-0">
             <Image 
               src="/logo.png" 
               alt="Almedin Bau Logo" 

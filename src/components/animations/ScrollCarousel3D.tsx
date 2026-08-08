@@ -222,15 +222,25 @@ export function ScrollCarousel3D({
   // many times the stage is re-measured.
   useGSAP(
     () => {
+      const scene = sceneRef.current;
       const ring = ringRef.current;
-      if (!ring || prefersReducedMotion()) return;
+      if (!scene || !ring || prefersReducedMotion()) return;
 
-      // Only `y` — never `opacity`, and never on the cells.
-      // `opacity` below 1 is a grouping property: like `overflow` and
-      // `filter`, it forces `transform-style` to compute to `flat`. Fading the
-      // 3D cells collapses the ring's depth for the duration of the tween, and
-      // mirrored backfaces show through.
-      gsap.from(ring, { y: 26, duration: 1.2, ease: 'expo.out', delay: 0.45 });
+      // Scroll-triggered, NOT a bare `delay`. A delay fires relative to mount,
+      // so in any section below the fold the entrance plays while the user is
+      // still looking at the hero — and by the time they arrive everything is
+      // already in place, with nothing left to watch.
+      //
+      // Only `y` — never `opacity`, and never on the cells. `opacity` below 1
+      // is a grouping property: like `overflow` and `filter`, it forces
+      // `transform-style` to compute to `flat`. Fading the 3D cells collapses
+      // the ring's depth mid-tween and mirrored backfaces show through.
+      gsap.from(ring, {
+        y: 30,
+        duration: 1.3,
+        ease: 'expo.out',
+        scrollTrigger: { trigger: scene, start: 'top 82%', once: true },
+      });
     },
     { scope: sceneRef }
   );

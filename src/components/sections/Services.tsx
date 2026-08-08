@@ -2,7 +2,6 @@
 
 import { useRef } from 'react';
 import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
-import { RevealText } from '@/components/animations/RevealText';
 import { ScrollCarousel3D, type CarouselItem } from '@/components/animations/ScrollCarousel3D';
 import { CTAButton } from '@/components/ui/CTAButton';
 
@@ -44,32 +43,116 @@ const SERVICES: CarouselItem[] = [
     image: '/images/hero_carousel_4.png',
     meta: [
       { label: 'Leistung', value: 'Trockenbau & Ausbau' },
+      { label: 'Umfang', value: 'Gewerbe & Privat' },
     ],
   },
 ];
 
-/** Scroll distance the section stays pinned. ~375px per card reads as one
- *  deliberate turn each; below ~300 the ring spins faster than it can be read. */
+const WORD = 'BAUKUNST';
+const EYEBROW_LEFT = 'Von der Grundsteinlegung';
+const EYEBROW_RIGHT = 'zur finalen Schlüsselübergabe';
+
+/** ~375px of scroll per card. Below ~300 the ring turns faster than it reads. */
 const PIN_DISTANCE = SERVICES.length * 375;
 
+/**
+ * Services.
+ *
+ * One master timeline, scroll-triggered, `once: true`.
+ *
+ * The text is NOT wrapped in RevealText here. RevealText owns its own trigger,
+ * which means every element in this section would animate independently and
+ * nothing could be sequenced against anything else. For a section whose whole
+ * point is that a technical drawing assembles itself, the order is the design —
+ * so the masked spans are inlined and driven from a single timeline.
+ *
+ * Draw order is the order a draughtsman would work in: rules, then the grid,
+ * then the registration marks, then the labels, then the title. Reversing any
+ * of it (title first, rules last) reads as decoration arriving late rather than
+ * as a sheet being drawn.
+ */
 export function Services() {
   const root = useRef<HTMLElement>(null);
 
   useGSAP(
     () => {
       const el = root.current;
-      if (!el || prefersReducedMotion()) return;
+      if (!el) return;
 
+      if (prefersReducedMotion()) {
+        gsap.set(
+          ['.sv-rule-h', '.sv-rule-v', '.sv-star', '.sv-eyebrow', '.sv-desc', '.sv-char'],
+          { scaleX: 1, scaleY: 1, opacity: 1, yPercent: 0, y: 0 }
+        );
+        return;
+      }
+
+      gsap
+        .timeline({
+          scrollTrigger: { trigger: el, start: 'top 72%', once: true },
+        })
+        // 1 — horizontal rules draw left to right
+        .fromTo(
+          '.sv-rule-h',
+          { scaleX: 0 },
+          {
+            scaleX: 1,
+            duration: 1.3,
+            ease: 'expo.out',
+            stagger: 0.08,
+            transformOrigin: 'left center',
+          }
+        )
+        // 2 — verticals drop from the top rule they hang off
+        .fromTo(
+          '.sv-rule-v',
+          { scaleY: 0 },
+          {
+            scaleY: 1,
+            duration: 1.2,
+            ease: 'expo.out',
+            stagger: 0.06,
+            transformOrigin: 'top center',
+          },
+          0.25
+        )
+        // 3 — registration marks land on the intersections
+        .fromTo(
+          '.sv-star',
+          { scale: 0, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.5, ease: 'back.out(2)', stagger: 0.035 },
+          0.55
+        )
+        // 4 — labels
+        .fromTo(
+          '.sv-eyebrow',
+          { yPercent: 115 },
+          { yPercent: 0, duration: 0.9, ease: 'expo.out', stagger: 0.05 },
+          0.65
+        )
+        .fromTo(
+          '.sv-desc',
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out' },
+          0.85
+        )
+        // 5 — the title last, so it lands on a sheet that already exists
+        .fromTo(
+          '.sv-char',
+          { yPercent: 118 },
+          { yPercent: 0, duration: 1.15, ease: 'expo.out', stagger: 0.035 },
+          0.95
+        );
+
+      // The pin itself is created by ScrollCarousel3D, from the SAME trigger
+      // that turns the ring. This tween only borrows the range — it must never
+      // set `pin` again. Light drift only: the section is held on screen for
+      // PIN_DISTANCE px, so real travel would spend all of it sliding.
       gsap.to('.sv-word', {
         yPercent: -6,
         opacity: 0.5,
         ease: 'none',
-        scrollTrigger: {
-          trigger: el,
-          start: 'top top',
-          end: `+=${PIN_DISTANCE}`,
-          scrub: 1,
-        },
+        scrollTrigger: { trigger: el, start: 'top top', end: `+=${PIN_DISTANCE}`, scrub: 1 },
       });
     },
     { scope: root }
@@ -80,92 +163,85 @@ export function Services() {
       ref={root}
       data-theme="light"
       id="leistungen"
-      className="relative min-h-svh flex flex-col pt-10 md:pt-14 pb-6 overflow-x-clip"
-      style={{ paddingInline: 'var(--frame)' }}
+      className="relative min-h-svh flex flex-col pt-10 md:pt-14 pb-6 overflow-x-clip px-frame"
     >
-      <div
-        className="relative w-full max-w-[1200px] mx-auto flex-1 flex flex-col border-x border-black/10"
-      >
-        {/* Vertical grid lines */}
-        <div className="hidden md:block absolute inset-0 pointer-events-none z-0">
-          <span
-            className="absolute top-0 bottom-0 left-[25%] w-px bg-black/10"
-          />
-          <span
-            className="absolute top-0 bottom-0 left-[75%] w-px bg-black/10"
-          />
-        </div>
+      <div className="relative w-full max-w-[1200px] mx-auto flex-1 flex flex-col">
+        {/* Frame verticals — spans, not borders, so they can be drawn */}
+        <span className="sv-rule-v absolute top-0 bottom-0 left-0 w-px bg-page-hair origin-top" />
+        <span className="sv-rule-v absolute top-0 bottom-0 right-0 w-px bg-page-hair origin-top" />
+        <span className="sv-rule-v hidden md:block absolute top-0 bottom-0 left-1/4 w-px bg-page-hair origin-top" />
+        <span className="sv-rule-v hidden md:block absolute top-0 bottom-0 left-3/4 w-px bg-page-hair origin-top" />
 
         {/* Eyebrow rail */}
-        <div
-          className="w-full relative z-10 border-t border-b border-black/10"
-        >
-          <div
-            className="hidden md:flex flex-row justify-between items-center w-full uppercase tracking-[0.22em] text-[11px] py-4 px-6 relative text-[#4D4C49]"
-          >
-            <RevealText text="Von der Grundsteinlegung" immediate delay={0.25} />
+        <div className="relative w-full">
+          <span className="sv-rule-h absolute top-0 inset-x-0 h-px bg-page-hair origin-left" />
+          <StarRow className="top-0" />
+
+          <div className="hidden md:flex flex-row justify-between items-center w-full uppercase tracking-[0.22em] text-[11px] text-page-muted py-4 px-6">
+            <MaskedText text={EYEBROW_LEFT} />
             <div className="flex items-center gap-4">
-              <span className="w-12 h-px bg-black/15" />
-              <RevealText text="BIS" className="font-medium" immediate delay={0.32} />
-              <span className="w-12 h-px bg-black/15" />
+              <span className="sv-rule-h w-12 h-px bg-page-hair origin-left" />
+              <MaskedText text="BIS" className="font-medium" />
+              <span className="sv-rule-h w-12 h-px bg-page-hair origin-left" />
             </div>
-            <RevealText text="zur finalen Schlüsselübergabe" immediate delay={0.39} />
-
-            <GridStarRow edge="top" />
+            <MaskedText text={EYEBROW_RIGHT} />
           </div>
 
-          <div
-            className="flex md:hidden items-center justify-center text-center uppercase tracking-[0.14em] text-[10px] font-medium py-3.5 px-4 text-[#4D4C49]"
-          >
-            <RevealText text="Von der Grundsteinlegung bis zur Übergabe" immediate delay={0.25} />
+          <div className="flex md:hidden flex-col items-center justify-center text-center uppercase tracking-[0.16em] text-[9.5px] font-medium text-page-muted py-3 px-3">
+            <MaskedText text={EYEBROW_LEFT} />
+            <div className="flex items-center gap-2 text-[8.5px] tracking-[0.22em] opacity-60 my-1">
+              <span className="w-6 h-px bg-page-hair" />
+              <span>BIS</span>
+              <span className="w-6 h-px bg-page-hair" />
+            </div>
+            <MaskedText text={EYEBROW_RIGHT} />
           </div>
+
+          <span className="sv-rule-h absolute bottom-0 inset-x-0 h-px bg-page-hair origin-left" />
         </div>
 
         {/* Description */}
-        <div
-          className="w-full grid grid-cols-1 md:grid-cols-4 relative z-10 border-b border-black/10"
-        >
+        <div className="relative w-full grid grid-cols-1 md:grid-cols-4">
           <div className="hidden md:flex col-span-1 items-center justify-center p-4">
-            <span
-              className="font-mono text-[11px] uppercase tracking-[0.2em] font-medium text-black/40"
-            >
+            <span className="sv-desc font-mono text-[11px] uppercase tracking-[0.2em] font-medium text-page-muted">
               Leistungen
             </span>
           </div>
 
           <div className="col-span-1 md:col-span-2 flex justify-center py-4 px-5 md:px-6">
-            <p
-              className="text-center text-[13px] md:text-[15px] max-w-[600px] leading-relaxed m-0 text-black/70"
-            >
-              Unsere Kernkompetenzen im Überblick. Erfahren Sie, wie wir Ihr Bauprojekt
-              mit höchstem Qualitätsanspruch, transparenter Planung und zuverlässiger
-              Ausführung zum Erfolg führen — entdecken Sie unsere Leistungen beim Scrollen.
+            <p className="sv-desc m-0 text-center max-w-[600px] leading-relaxed text-page-muted text-[clamp(13px,1.05vw,16px)]">
+              Unsere Kernkompetenzen im Überblick. Erfahren Sie, wie wir Ihr
+              Bauprojekt mit höchstem Qualitätsanspruch, transparenter Planung und
+              zuverlässiger Ausführung zum Erfolg führen — entdecken Sie unsere
+              Leistungen beim Scrollen.
             </p>
           </div>
 
           <div className="hidden md:flex col-span-1 items-center justify-center p-4">
-            <span
-              className="font-mono text-[11px] uppercase tracking-[0.2em] font-medium text-black/40"
-            >
+            <span className="sv-desc font-mono text-[11px] uppercase tracking-[0.2em] font-medium text-page-muted">
               Kernkompetenzen
             </span>
           </div>
 
-          <GridStarRow edge="bottom" />
+          <span className="sv-rule-h absolute bottom-0 inset-x-0 h-px bg-page-hair origin-left" />
+          <StarRow className="bottom-0 translate-y-1/2" />
         </div>
 
         {/* Wordmark + ring */}
-        <div className="relative flex-1 flex flex-col items-center justify-center px-3 md:px-6 z-10">
+        <div className="relative flex-1 flex flex-col items-center justify-center px-3 md:px-6">
           <h2
-            className="sv-word absolute inset-x-0 top-[3%] text-center font-display font-medium uppercase leading-[0.9] tracking-[-0.04em] m-0 pointer-events-none text-[#0D0D0D]"
-            style={{
-              fontSize: 'clamp(2.2rem, 7.5vw, 5.2rem)',
-              textWrap: 'balance',
-            }}
+            className="sv-word absolute inset-x-0 top-[3%] m-0 text-center font-display font-medium uppercase leading-[0.9] tracking-[-0.04em] text-page-ink pointer-events-none text-[clamp(2.2rem,7.5vw,5.2rem)]"
+            aria-label={WORD}
           >
-            <RevealText text="BAUKUNST" split="char" immediate delay={0.45} as="span" />
+            {Array.from(WORD).map((c, i) => (
+              <span key={i} className="inline-block overflow-hidden align-bottom">
+                <span className="sv-char inline-block will-change-transform">{c}</span>
+              </span>
+            ))}
           </h2>
 
+          {/* The carousel sizes its cards from THIS box, so the ring cannot
+              spill past the grid — lower `fit` for more air, never a radius. */}
           <div className="relative z-10 w-full h-[clamp(300px,48vw,470px)] mt-[6%]">
             <ScrollCarousel3D
               items={SERVICES}
@@ -174,14 +250,15 @@ export function Services() {
               snap
               rotation={360}
               restOffset={0.3}
-              fit={0.9}
+              fit={0.8}
             />
           </div>
         </div>
 
-        {/* Bottom rule */}
-        <div className="w-full relative z-10 border-b border-black/10">
-          <GridStarRow edge="top" />
+        {/* Closing rule */}
+        <div className="relative w-full">
+          <span className="sv-rule-h absolute top-0 inset-x-0 h-px bg-page-hair origin-left" />
+          <StarRow className="top-0" />
         </div>
       </div>
 
@@ -194,26 +271,36 @@ export function Services() {
 
 /* ------------------------------------------------------------------ */
 
-function GridStarRow({ edge }: { edge: 'top' | 'bottom' }) {
-  const y = edge === 'top' ? 'top-0' : 'top-full';
+/** A word split into masked units the master timeline can stagger. */
+function MaskedText({ text, className = '' }: { text: string; className?: string }) {
   return (
-    <div className={`hidden md:block absolute ${edge === 'top' ? 'top-0' : 'bottom-0'} left-0 w-full pointer-events-none z-20`}>
-      {['left-0', 'left-[25%]', 'left-[75%]', 'left-full'].map((x) => (
-        <GridStar key={x} className={`${y} ${x}`} />
+    <span className={className}>
+      {text.split(' ').map((word, i, arr) => (
+        <span key={`${word}-${i}`} className="inline-flex overflow-hidden pb-[0.14em] -mb-[0.14em] align-bottom">
+          <span className="sv-eyebrow inline-block will-change-transform">
+            {word}
+            {i < arr.length - 1 ? '\u00A0' : ''}
+          </span>
+        </span>
       ))}
-    </div>
+    </span>
   );
 }
 
-function GridStar({ className = '' }: { className?: string }) {
+function StarRow({ className = '' }: { className?: string }) {
   return (
-    <span
-      className={`absolute z-20 flex items-center justify-center w-6 h-6 -translate-x-1/2 -translate-y-1/2 text-black/20 ${className}`}
-      aria-hidden
-    >
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" />
-      </svg>
-    </span>
+    <div className={`hidden md:block absolute left-0 w-full pointer-events-none z-20 ${className}`}>
+      {['left-0', 'left-1/4', 'left-3/4', 'left-full'].map((x) => (
+        <span
+          key={x}
+          className={`sv-star absolute ${x} flex items-center justify-center w-6 h-6 -translate-x-1/2 -translate-y-1/2 text-page-hair`}
+          aria-hidden
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" />
+          </svg>
+        </span>
+      ))}
+    </div>
   );
 }

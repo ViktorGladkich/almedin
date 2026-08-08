@@ -169,14 +169,14 @@ export function CTACounter() {
         </div>
 
         {/* Main Container */}
-        <div className="relative z-10 w-full max-w-[1880px] mx-auto flex flex-col items-center pt-[100px] sm:pt-[140px] md:pt-[180px] px-[16px] sm:px-[24px] md:px-[30px] gap-[180px] sm:gap-[280px] md:gap-[380px] pb-[60px] sm:pb-[90px] md:pb-[140px]">
+        <div className="relative z-10 w-full max-w-[1880px] mx-auto flex flex-col items-center pt-12 sm:pt-[140px] md:pt-[180px] px-3.5 sm:px-[24px] md:px-[30px] gap-16 sm:gap-[200px] md:gap-[380px] pb-10 sm:pb-[90px] md:pb-[140px]">
           
           {/* Top Content (Heading & Buttons) */}
           <div className="flex flex-col items-center max-w-4xl text-center">
             
-            <div className="flex flex-wrap justify-center gap-x-[0.3em] gap-y-[0.1em] text-4xl md:text-6xl lg:text-7xl font-display font-medium text-[#fffcf4] tracking-tight mb-6">
+            <div className="flex flex-wrap justify-center gap-x-[0.25em] gap-y-[0.1em] text-[26px] xs:text-[30px] sm:text-5xl md:text-6xl lg:text-7xl font-display font-medium text-[#fffcf4] leading-[1.15] sm:leading-tight tracking-tight mb-4 sm:mb-6">
               {headingWords.map((word, i) => (
-                <span key={i} className="overflow-hidden inline-flex pb-2 -mb-2">
+                <span key={i} className="overflow-hidden inline-flex pb-1.5 -mb-1.5">
                   <span className="split-cta-inner inline-block will-change-transform origin-bottom-left opacity-0">
                     {word}
                   </span>
@@ -184,63 +184,63 @@ export function CTACounter() {
               ))}
             </div>
 
-            <p className="cta-ui text-lg md:text-xl text-[#fffcf4]/90 font-light mb-10 max-w-2xl opacity-0 will-change-transform">
+            <p className="cta-ui text-sm sm:text-lg md:text-xl text-[#fffcf4]/90 font-light mb-6 sm:mb-10 max-w-2xl opacity-0 will-change-transform">
               Großartige Gebäude zeichnen sich nicht durch ihre Größe aus, sondern durch ihren Einfluss auf die Menschen, die sie nutzen.
             </p>
             
-            <div className="cta-ui flex flex-col sm:flex-row items-center gap-6 mt-4 opacity-0 will-change-transform">
-              <CTAButton text="Projekt starten" href="/contact" className="shadow-2xl shadow-[#FF3131]/20" />
-              <CTAButton text="Projekte erkunden" href="/projects" variant="light" className="shadow-2xl shadow-black/20" />
+            <div className="cta-ui flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-6 mt-2 sm:mt-4 w-full opacity-0 will-change-transform">
+              <CTAButton text="Projekt starten" href="/contact" size="responsive" className="shadow-2xl shadow-[#FF3131]/20" />
+              <CTAButton text="Projekte erkunden" href="/projects" variant="light" size="responsive" className="shadow-2xl shadow-black/20" />
             </div>
           </div>
 
           {/* Bottom Content (Counters & Sectors) */}
-          <div className="w-full flex flex-col items-center gap-24">
+          <div className="w-full flex flex-col items-center gap-10 sm:gap-16 md:gap-24">
             
             {/* Counters (Glassmorphism) */}
             <div className="w-full max-w-[1400px] mx-auto">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {/* Counter 1 */}
-                <div className="cta-counter-box opacity-0 bg-[#fffcf4]/10 backdrop-blur-md rounded-2xl p-8 flex flex-col justify-between h-[160px] border border-white/10" style={{ transformStyle: 'preserve-3d' }}>
-                  <p className="text-[#fffcf4] text-sm md:text-base font-light tracking-wide uppercase">
+                <div className="cta-counter-box opacity-0 bg-[#fffcf4]/10 backdrop-blur-md rounded-xl sm:rounded-2xl p-4 sm:p-8 flex flex-col justify-between h-[135px] sm:h-[160px] border border-white/10" style={{ transformStyle: 'preserve-3d' }}>
+                  <p className="text-[#fffcf4] text-[11px] sm:text-sm md:text-base font-light tracking-wide uppercase line-clamp-2">
                     Abgeschlossene Projekte
                   </p>
-                  <div className="w-full h-[1px] bg-[#cccac2]/30 my-4" />
-                  <h3 ref={counter1Ref} className="text-[#fffcf4] text-5xl font-display font-medium">0+</h3>
+                  <div className="w-full h-[1px] bg-[#cccac2]/30 my-2 sm:my-4" />
+                  <h3 ref={counter1Ref} className="text-[#fffcf4] text-3xl sm:text-5xl font-display font-medium">0+</h3>
                 </div>
                 {/* Counter 2 */}
-                <div className="cta-counter-box opacity-0 bg-[#fffcf4]/10 backdrop-blur-md rounded-2xl p-8 flex flex-col justify-between h-[160px] border border-white/10" style={{ transformStyle: 'preserve-3d' }}>
-                  <p className="text-[#fffcf4] text-sm md:text-base font-light tracking-wide uppercase">
+                <div className="cta-counter-box opacity-0 bg-[#fffcf4]/10 backdrop-blur-md rounded-xl sm:rounded-2xl p-4 sm:p-8 flex flex-col justify-between h-[135px] sm:h-[160px] border border-white/10" style={{ transformStyle: 'preserve-3d' }}>
+                  <p className="text-[#fffcf4] text-[11px] sm:text-sm md:text-base font-light tracking-wide uppercase line-clamp-2">
                     Bauexperten
                   </p>
-                  <div className="w-full h-[1px] bg-[#cccac2]/30 my-4" />
-                  <h3 ref={counter2Ref} className="text-[#fffcf4] text-5xl font-display font-medium">0+</h3>
+                  <div className="w-full h-[1px] bg-[#cccac2]/30 my-2 sm:my-4" />
+                  <h3 ref={counter2Ref} className="text-[#fffcf4] text-3xl sm:text-5xl font-display font-medium">0+</h3>
                 </div>
                 {/* Counter 3 */}
-                <div className="cta-counter-box opacity-0 bg-[#fffcf4]/10 backdrop-blur-md rounded-2xl p-8 flex flex-col justify-between h-[160px] border border-white/10" style={{ transformStyle: 'preserve-3d' }}>
-                  <p className="text-[#fffcf4] text-sm md:text-base font-light tracking-wide uppercase">
+                <div className="cta-counter-box opacity-0 bg-[#fffcf4]/10 backdrop-blur-md rounded-xl sm:rounded-2xl p-4 sm:p-8 flex flex-col justify-between h-[135px] sm:h-[160px] border border-white/10" style={{ transformStyle: 'preserve-3d' }}>
+                  <p className="text-[#fffcf4] text-[11px] sm:text-sm md:text-base font-light tracking-wide uppercase line-clamp-2">
                     Jahre Erfahrung
                   </p>
-                  <div className="w-full h-[1px] bg-[#cccac2]/30 my-4" />
-                  <h3 ref={counter3Ref} className="text-[#fffcf4] text-5xl font-display font-medium">0</h3>
+                  <div className="w-full h-[1px] bg-[#cccac2]/30 my-2 sm:my-4" />
+                  <h3 ref={counter3Ref} className="text-[#fffcf4] text-3xl sm:text-5xl font-display font-medium">0</h3>
                 </div>
                 {/* Counter 4 */}
-                <div className="cta-counter-box opacity-0 bg-[#fffcf4]/10 backdrop-blur-md rounded-2xl p-8 flex flex-col justify-between h-[160px] border border-white/10" style={{ transformStyle: 'preserve-3d' }}>
-                  <p className="text-[#fffcf4] text-sm md:text-base font-light tracking-wide uppercase">
+                <div className="cta-counter-box opacity-0 bg-[#fffcf4]/10 backdrop-blur-md rounded-xl sm:rounded-2xl p-4 sm:p-8 flex flex-col justify-between h-[135px] sm:h-[160px] border border-white/10" style={{ transformStyle: 'preserve-3d' }}>
+                  <p className="text-[#fffcf4] text-[11px] sm:text-sm md:text-base font-light tracking-wide uppercase line-clamp-2">
                     m² umbauter Raum
                   </p>
-                  <div className="w-full h-[1px] bg-[#cccac2]/30 my-4" />
-                  <h3 ref={counter4Ref} className="text-[#fffcf4] text-5xl font-display font-medium">0.0M+</h3>
+                  <div className="w-full h-[1px] bg-[#cccac2]/30 my-2 sm:my-4" />
+                  <h3 ref={counter4Ref} className="text-[#fffcf4] text-3xl sm:text-5xl font-display font-medium">0.0M+</h3>
                 </div>
               </div>
             </div>
 
             {/* Active Sectors */}
-            <div className="w-full flex flex-col items-center gap-6">
-              <p className="cta-ui opacity-0 text-[#fffcf4]/80 text-[12px] font-medium tracking-widest uppercase will-change-transform">
+            <div className="w-full flex flex-col items-center gap-4 sm:gap-6">
+              <p className="cta-ui opacity-0 text-[#fffcf4]/80 text-[11px] sm:text-[12px] font-medium tracking-widest uppercase will-change-transform">
                 Aktive Sektoren
               </p>
-              <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-[#fffcf4] text-[15px] font-light">
+              <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[#fffcf4] text-xs sm:text-[15px] font-light">
                 <span className="cta-ui opacity-0 will-change-transform">Wohnbau</span>
                 <div className="cta-ui opacity-0 w-[1px] h-3 bg-white/20 will-change-transform" />
                 <span className="cta-ui opacity-0 will-change-transform">Gewerbe</span>

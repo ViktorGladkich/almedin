@@ -45,9 +45,9 @@ export function ProjectIntake() {
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} className="relative w-full bg-[#F2F0EC] p-2 sm:p-4 md:p-6 overflow-hidden">
+    <section ref={sectionRef} className="relative w-full bg-[#F2F0EC] p-2.5 sm:p-4 md:p-6 overflow-hidden">
       {/* FRAMED CARD CONTAINER (Matching HeroFramed) */}
-      <div className="relative w-full overflow-hidden rounded-[14px] sm:rounded-[20px] bg-[#0D0D0D] border border-black/10 shadow-[0_10px_35px_rgba(0,0,0,0.08)] min-h-[440px] sm:min-h-[550px] md:min-h-[700px] flex items-center justify-center p-4 sm:p-8 md:p-12">
+      <div className="relative w-full overflow-hidden rounded-[14px] sm:rounded-[20px] bg-[#0D0D0D] border border-black/10 shadow-[0_10px_35px_rgba(0,0,0,0.08)] min-h-[380px] sm:min-h-[550px] md:min-h-[700px] flex items-center justify-center p-3 sm:p-8 md:p-12">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image 
@@ -61,7 +61,7 @@ export function ProjectIntake() {
         </div>
 
         {/* Inner Bordered Container */}
-        <div className="relative z-10 w-full max-w-[1400px] min-h-[360px] sm:min-h-[460px] md:min-h-[550px] border border-[#cccac2]/40 flex flex-col items-center justify-center pointer-events-none py-10 sm:py-16 md:py-20 px-4 sm:px-8">
+        <div className="relative z-10 w-full max-w-[1400px] min-h-[320px] sm:min-h-[460px] md:min-h-[550px] border border-[#cccac2]/40 flex flex-col items-center justify-center pointer-events-none py-8 sm:py-16 md:py-20 px-3 sm:px-8">
           
           {/* Corner Icons */}
           <div className="intake-corner absolute -top-3 -left-3 text-[#cccac2]">
@@ -79,16 +79,17 @@ export function ProjectIntake() {
 
           {/* Content */}
           <div className="intake-content flex flex-col items-center text-center px-2 sm:px-4 pointer-events-auto">
-            <p className="text-[#d1d0cc] uppercase tracking-widest text-[11px] sm:text-sm md:text-base font-medium mb-3 sm:mb-6">
+            <p className="text-[#d1d0cc] uppercase tracking-widest text-[10px] sm:text-sm md:text-base font-medium mb-3 sm:mb-6">
               Projektanfrage // 2026
             </p>
-            <h2 className="text-[24px] sm:text-4xl md:text-7xl lg:text-[80px] font-display font-medium text-[#fffcf4] leading-[1.18] sm:leading-tight mb-8 sm:mb-12 max-w-3xl">
+            <h2 className="text-[22px] xs:text-[26px] sm:text-4xl md:text-7xl lg:text-[80px] font-display font-medium text-[#fffcf4] leading-[1.2] sm:leading-tight mb-6 sm:mb-12 max-w-3xl">
               Lassen Sie uns für die Ewigkeit bauen
             </h2>
             
             <CTAButton 
               href="/contact" 
               text="Starten Sie Ihr Projekt" 
+              size="responsive"
             />
           </div>
         </div>

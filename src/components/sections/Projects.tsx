@@ -1,13 +1,12 @@
 'use client';
 
-import { useRef, useState, useEffect, useCallback, Fragment } from 'react';
+import { useRef, useState, useEffect, Fragment } from 'react';
 import { gsap, useGSAP, ScrollTrigger, prefersReducedMotion } from '@/lib/gsap';
 import { lockScroll, unlockScroll } from '@/lib/lenis';
 import { RevealText } from '@/components/animations/RevealText';
 import { FadeInUp } from '@/components/animations/FadeInUp';
 import { MapPin, Expand } from 'lucide-react';
 import { CTAButton } from '@/components/ui/CTAButton';
-import { Ticker } from '@/components/ui/Ticker';
 
 const PROJECTS = [
   {
@@ -87,40 +86,54 @@ export function Projects() {
     return () => unlockScroll();
   }, [activeProject]);
 
-  /* -- preview ------------------------------------------------------------- */
-  const openPreview = contextSafe((index: number) => {
+  /* -- preview -------------------------------------------------------------
+     These are PLAIN functions, rebuilt on every render, so they always close
+     over the current `isAnimating` and `activeProject`.
+
+     They are not wrapped in `contextSafe` at definition time. `contextSafe`
+     returns a function bound to the GSAP context that is NOT rebuilt between
+     renders, so state captured inside it stays frozen at first render —
+     `isAnimating` was permanently false and the re-entry guard never fired,
+     which let a fast double click start two timelines at once. Mirroring state
+     into refs fixed that but violates the rule against touching refs during
+     render, so instead `contextSafe` is applied at call time, around the GSAP
+     work only.
+  ------------------------------------------------------------------------- */
+  const openPreview = (index: number) => {
     if (isAnimating) return;
     setIsAnimating(true);
     setActiveProject(index);
 
-    gsap
-      .timeline({
-        defaults: { duration: 1.1, ease: 'expo' },
-        onStart: () => {
-          gsap.set(`.preview-img-${index}`, { xPercent: 100 });
-          gsap.set(`.preview-img-wrap-${index}`, { xPercent: -102, opacity: 0 });
-          gsap.set(`.preview-slide-text-${index}`, { yPercent: 100 });
-          gsap.set(`.preview-desc-${index}`, { yPercent: 15, opacity: 0 });
-          gsap.set('.preview__back', { x: '15%', opacity: 0 });
-        },
-        onComplete: () => setIsAnimating(false),
-      })
-      .addLabel('start', 0)
-      .addLabel('preview', 'start+=0.3')
-      .to('.overlay__inner', { ease: 'power2', startAt: { xPercent: -100 }, xPercent: 0 }, 'start')
-      .to([`.preview-img-${index}`, `.preview-img-wrap-${index}`], { xPercent: 0 }, 'preview')
-      .to(`.preview-img-wrap-${index}`, { opacity: 1 }, 'preview')
-      .to(`.preview-slide-text-${index}`, { yPercent: 0, stagger: 0.05 }, 'preview')
-      .to(`.preview-desc-${index}`, { ease: 'power2', opacity: 1, yPercent: 0, stagger: 0.05 }, 'preview')
-      .to('.preview__back', { ease: 'power2', opacity: 1, x: '0%' }, 'preview');
-  });
-
-  const closePreview = useCallback(
     contextSafe(() => {
-      if (isAnimating || activeProject === null) return;
-      setIsAnimating(true);
-      const index = activeProject;
+      gsap
+        .timeline({
+          defaults: { duration: 1.1, ease: 'expo' },
+          onStart: () => {
+            gsap.set(`.preview-img-${index}`, { xPercent: 100 });
+            gsap.set(`.preview-img-wrap-${index}`, { xPercent: -102, opacity: 0 });
+            gsap.set(`.preview-slide-text-${index}`, { yPercent: 100 });
+            gsap.set(`.preview-desc-${index}`, { yPercent: 15, opacity: 0 });
+            gsap.set('.preview__back', { x: '15%', opacity: 0 });
+          },
+          onComplete: () => setIsAnimating(false),
+        })
+        .addLabel('start', 0)
+        .addLabel('preview', 'start+=0.3')
+        .to('.overlay__inner', { ease: 'power2', startAt: { xPercent: -100 }, xPercent: 0 }, 'start')
+        .to([`.preview-img-${index}`, `.preview-img-wrap-${index}`], { xPercent: 0 }, 'preview')
+        .to(`.preview-img-wrap-${index}`, { opacity: 1 }, 'preview')
+        .to(`.preview-slide-text-${index}`, { yPercent: 0, stagger: 0.05 }, 'preview')
+        .to(`.preview-desc-${index}`, { ease: 'power2', opacity: 1, yPercent: 0, stagger: 0.05 }, 'preview')
+        .to('.preview__back', { ease: 'power2', opacity: 1, x: '0%' }, 'preview');
+    })();
+  };
 
+  const closePreview = () => {
+    if (isAnimating || activeProject === null) return;
+    const index = activeProject;
+    setIsAnimating(true);
+
+    contextSafe(() => {
       gsap
         .timeline({
           defaults: { duration: 1, ease: 'power4' },
@@ -136,17 +149,21 @@ export function Projects() {
         .to(`.preview-img-${index}`, { xPercent: -100 }, 'start')
         .to(`.preview-img-wrap-${index}`, { xPercent: 100, opacity: 1 }, 'start')
         .to('.overlay__inner', { ease: 'power2', xPercent: 100 }, 'start+=0.4');
-    }),
-    [activeProject, isAnimating]
-  );
+    })();
+  };
 
   /* -- escape --------------------------------------------------------------- */
   useEffect(() => {
     if (activeProject === null) return;
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && closePreview();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closePreview();
+    };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [activeProject, closePreview]);
+    // closePreview is a new function every render; listing it would tear the
+    // listener down and re-attach it on each one.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeProject]);
 
   /* -- stacking scroll ------------------------------------------------------ */
   useGSAP(
@@ -210,13 +227,13 @@ export function Projects() {
       ref={container}
       data-theme="light"
       id="projects"
-      className="relative py-28 md:py-32 max-w-[1400px] mx-auto px-frame"
+      className="relative py-16 sm:py-24 md:py-32 max-w-[1400px] mx-auto px-frame"
     >
-      <div className="mb-14 md:mb-20 flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div className="mb-8 sm:mb-14 md:mb-20 flex flex-row items-end justify-between gap-4">
         <RevealText
           text="Unsere Projekte"
           as="h2"
-          className="m-0 font-display font-medium tracking-tight text-page-ink text-[clamp(2rem,4.5vw,4rem)]"
+          className="m-0 font-display font-medium tracking-tight text-page-ink text-[clamp(1.75rem,4.5vw,4rem)]"
         />
         <FadeInUp delay={0.2}>
           <CTAButton text="Alle ansehen" href="/projekte" />
@@ -233,7 +250,7 @@ export function Projects() {
             <span className="project-marker block h-0 w-full" aria-hidden />
 
             <div
-              className={`project-card-${index} sticky top-0 w-full lg:w-1/2 h-[52vh] lg:h-svh group cursor-pointer p-3 pt-20 md:p-8 md:pt-24 lg:p-12 lg:pt-32 ${
+              className={`project-card-${index} sticky top-0 w-full lg:w-1/2 h-[50vh] sm:h-[65vh] lg:h-svh group cursor-pointer p-2 pt-14 sm:p-4 sm:pt-20 md:p-8 md:pt-24 lg:p-12 lg:pt-32 ${
                 index % 2 === 0 ? 'lg:ml-auto' : ''
               }`}
             >
@@ -243,7 +260,7 @@ export function Projects() {
                 aria-label={`${project.title} ansehen`}
                 onKeyDown={(e) => onCardKey(e, index)}
                 onClick={() => openPreview(index)}
-                className={`content-img-wrap-${index} w-full h-full relative overflow-hidden rounded-[20px] will-change-transform outline-none shadow-[0_40px_80px_-30px_rgba(13,13,13,0.45)] focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2`}
+                className={`content-img-wrap-${index} w-full h-full relative overflow-hidden rounded-xl sm:rounded-[20px] will-change-transform outline-none shadow-[0_40px_80px_-30px_rgba(13,13,13,0.45)] focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2`}
               >
                 <div
                   className="absolute inset-0 bg-cover bg-center"
@@ -252,37 +269,37 @@ export function Projects() {
 
                 <div className="absolute inset-0 bg-black/45 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex items-center gap-2 rounded-md bg-accent px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.15em] text-white opacity-0 scale-90 transition-all duration-300 group-hover:opacity-100 group-hover:scale-100 pointer-events-none">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex items-center gap-2 rounded-md bg-accent px-4 py-2 sm:px-5 sm:py-2.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.15em] text-white opacity-0 scale-90 transition-all duration-300 group-hover:opacity-100 group-hover:scale-100 pointer-events-none">
                   Ansehen
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M7 17l9.2-9.2M17 17V7H7" />
                   </svg>
                 </div>
 
-                <div className="absolute top-5 left-5 right-5 z-10 flex justify-between items-start pointer-events-none">
-                  <span className="flex items-center gap-2 rounded-lg border border-white/15 bg-black/35 px-3.5 py-2 text-[12px] font-medium text-white">
-                    <MapPin className="w-3.5 h-3.5" />
+                <div className="absolute top-3 left-3 right-3 sm:top-5 sm:left-5 sm:right-5 z-10 flex justify-between items-start pointer-events-none">
+                  <span className="flex items-center gap-1.5 sm:gap-2 rounded-lg border border-white/15 bg-black/35 px-2.5 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-[12px] font-medium text-white">
+                    <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                     {project.subtitle}
                   </span>
-                  <span className="rounded-lg border border-white/15 bg-black/35 px-3.5 py-2 text-[12px] font-medium text-white">
+                  <span className="rounded-lg border border-white/15 bg-black/35 px-2.5 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-[12px] font-medium text-white">
                     {project.year}
                   </span>
                 </div>
 
-                <div className="absolute bottom-5 left-5 right-5 z-10 pointer-events-none">
-                  <div className="rounded-xl border border-white/12 bg-black/45 p-5 md:p-6">
-                    <h3 className="m-0 text-xl md:text-2xl font-medium tracking-tight text-white">
+                <div className="absolute bottom-3 left-3 right-3 sm:bottom-5 sm:left-5 sm:right-5 z-10 pointer-events-none">
+                  <div className="rounded-lg sm:rounded-xl border border-white/12 bg-black/45 p-3.5 sm:p-5 md:p-6">
+                    <h3 className="m-0 text-lg sm:text-xl md:text-2xl font-medium tracking-tight text-white">
                       {project.title}
                     </h3>
-                    <div className="my-4 h-px w-full bg-white/20" />
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 text-[13px] text-white/85">
-                      <div className="flex items-center gap-3">
+                    <div className="my-2.5 sm:my-4 h-px w-full bg-white/20" />
+                    <div className="flex flex-row items-center justify-between gap-2 text-[11px] sm:text-[13px] text-white/85">
+                      <div className="flex items-center gap-2 sm:gap-3">
                         <span>{project.type}</span>
-                        <span className="h-3.5 w-px bg-white/30" />
+                        <span className="h-3 w-px bg-white/30" />
                         <span className="text-white/65">{project.area}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Expand className="w-3.5 h-3.5 opacity-70" />
+                      <div className="flex items-center gap-1.5 sm:gap-2">
+                        <Expand className="w-3 h-3 sm:w-3.5 sm:h-3.5 opacity-70" />
                         {project.size}
                       </div>
                     </div>
@@ -293,8 +310,6 @@ export function Projects() {
           </Fragment>
         ))}
       </div>
-
-      <Ticker className="mt-20 md:mt-28" />
 
       {/* Modal layers.
           The page has a fixed frame at z-60 and a header above it, so the

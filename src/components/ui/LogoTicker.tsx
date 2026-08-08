@@ -33,7 +33,7 @@ export function LogoTicker() {
     const loop = gsap.to(track, {
       xPercent: -50,
       ease: 'none',
-      duration: 30,
+      duration: 24,
       repeat: -1,
     });
     tweenRef.current = loop;
@@ -85,29 +85,29 @@ export function LogoTicker() {
   return (
     <section 
       ref={containerRef}
-      className="w-full bg-[#F2F0EC] pt-2 sm:pt-[10px] pb-1 sm:pb-0 overflow-hidden select-none relative z-20"
+      className="w-full bg-[#F2F0EC] py-4 sm:py-6 md:py-8 overflow-hidden select-none relative z-20 border-t border-b border-black/5"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       <div 
         className="w-full flex items-center overflow-hidden"
         style={{
-          maskImage: 'linear-gradient(90deg, transparent 0%, black 10%, black 90%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(90deg, transparent 0%, black 10%, black 90%, transparent 100%)'
+          maskImage: 'linear-gradient(90deg, transparent 0%, black 5%, black 95%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(90deg, transparent 0%, black 5%, black 95%, transparent 100%)'
         }}
       >
-        <div className="ticker-track flex items-center gap-8 sm:gap-16 md:gap-24 whitespace-nowrap w-max will-change-transform">
+        <div className="ticker-track flex items-center gap-6 sm:gap-14 md:gap-24 whitespace-nowrap w-max will-change-transform">
           {[...LOGO_IMAGES, ...LOGO_IMAGES, ...LOGO_IMAGES].map((logo, idx) => (
             <div 
               key={idx}
-              className="relative h-10 sm:h-16 md:h-20 w-28 sm:w-44 md:w-56 flex items-center justify-center grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-300 transform hover:scale-105"
+              className="relative h-7 xs:h-8 sm:h-14 md:h-18 w-20 xs:w-24 sm:w-40 md:w-52 flex items-center justify-center grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-300 transform hover:scale-105 shrink-0"
             >
               <Image 
                 src={logo.src} 
                 alt={logo.alt} 
                 fill 
                 className="object-contain"
-                sizes="(max-width: 768px) 112px, 224px"
+                sizes="(max-width: 768px) 96px, 208px"
               />
             </div>
           ))}

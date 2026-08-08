@@ -114,9 +114,9 @@ export function HeroFramed({
             where it sits bottom-left and bottom-right. */}
         <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-t from-[#0D0D0D]/95 via-[#0D0D0D]/50 to-black/20 md:bg-gradient-to-tl md:from-[#0D0D0D]/85 md:via-[#0D0D0D]/35 md:to-transparent" />
 
-        <div className="hf-overlay absolute inset-0 z-10 flex flex-col justify-end p-5 sm:p-7 md:p-10 lg:p-14 will-change-transform">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 lg:gap-12">
-            <h1 className="m-0 font-sans font-medium uppercase text-[#F2F0EC] leading-[1.05] tracking-[-0.02em] text-[clamp(1.75rem,5.6vw,6rem)]">
+        <div className="hf-overlay absolute inset-0 z-10 flex flex-col justify-end p-4 xs:p-5 sm:p-7 md:p-10 lg:p-14 will-change-transform">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 sm:gap-5 lg:gap-12">
+            <h1 className="m-0 font-sans font-medium uppercase text-[#F2F0EC] leading-[1.08] sm:leading-[1.05] tracking-[-0.02em] text-[clamp(1.75rem,7vw,6rem)]">
               {LINES.map((line) => (
                 // pt/-mt clears ascenders, pb/-mb clears descenders. Without the
                 // negative margins the mask padding becomes real leading and the
@@ -130,14 +130,14 @@ export function HeroFramed({
               ))}
             </h1>
 
-            <div className="flex flex-col gap-4 lg:max-w-[clamp(320px,26vw,460px)] shrink-0">
-              <p className="hf-info m-0 font-light leading-[1.55] text-[#F2F0EC]/90 text-[clamp(13px,1.05vw,17px)]">
+            <div className="flex flex-col gap-3 sm:gap-4 lg:max-w-[clamp(320px,26vw,460px)] shrink-0">
+              <p className="hf-info m-0 font-light leading-[1.5] sm:leading-[1.55] text-[#F2F0EC]/90 text-[13px] sm:text-[15px] md:text-[clamp(13px,1.05vw,17px)]">
                 Wir realisieren hochwertige Neubauten, Sanierungen und Bauprojekte
                 in Dresden und Sachsen — präzise geplant, transparent umgesetzt und
                 mit höchstem Qualitätsanspruch vollendet.
               </p>
-              <div className="hf-info flex items-center">
-                <CTAButton text="Beratung anfragen" href="/contact" variant="primary" />
+              <div className="hf-info flex items-center pt-0.5">
+                <CTAButton text="Kostenlose Beratung" href="/contact" variant="primary" size="responsive" />
               </div>
             </div>
           </div>

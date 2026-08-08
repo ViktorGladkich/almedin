@@ -116,11 +116,11 @@ export function Testimonials() {
   }, [nextSlide]);
 
   return (
-    <section ref={sectionRef} className="w-full bg-[#111111] py-20 md:py-[150px] flex justify-center overflow-hidden">
-      <div className="w-full max-w-[1400px] px-6 md:px-12 mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-stretch">
+    <section ref={sectionRef} className="w-full bg-[#111111] py-12 sm:py-20 md:py-[150px] flex justify-center overflow-hidden">
+      <div className="w-full max-w-[1400px] px-3.5 sm:px-6 md:px-12 mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-12 lg:gap-16 items-stretch">
         
         {/* Left Side: Image */}
-        <div className="testimonial-image relative w-full h-[400px] md:h-[500px] lg:h-auto lg:min-h-[600px] rounded-[4px] overflow-hidden" style={{ opacity: 0 }}>
+        <div className="testimonial-image relative w-full h-[260px] sm:h-[380px] md:h-[500px] lg:h-auto lg:min-h-[600px] rounded-[4px] overflow-hidden" style={{ opacity: 0 }}>
           <Image 
             src="/images/german_construction_site_1786013950666.png" 
             alt="Baustelle" 
@@ -140,18 +140,18 @@ export function Testimonials() {
           <GridStar className="top-full left-full" />
 
           {/* Top Section: Text */}
-          <div className="flex flex-col p-8 md:p-12 pb-16 md:pb-20">
-            <span className="text-[#b2b1ab] text-[14px] md:text-[15px] mb-6">
+          <div className="flex flex-col p-5 sm:p-8 md:p-12 pb-8 sm:pb-16 md:pb-20">
+            <span className="text-[#b2b1ab] text-[12px] sm:text-[14px] md:text-[15px] mb-4 sm:mb-6">
               Vertrauen unserer Kunden
             </span>
             
             <div ref={contentRef} className="flex flex-col">
               <Image 
                 src="https://framerusercontent.com/images/4s9Zo9U33qbSVqpl5Fd6gsESxRg.svg" 
-                width={100} 
-                height={18} 
+                width={90} 
+                height={16} 
                 alt="5 Sterne" 
-                className="mb-8"
+                className="mb-4 sm:mb-8"
               />
               <RevealText3D 
                 key={testimonials[currentIndex].id}
@@ -159,46 +159,46 @@ export function Testimonials() {
                 tag="h3"
                 scrub={false}
                 triggerOnScroll={true}
-                className="text-[#fffcf4] text-[24px] md:text-[32px] lg:text-[36px] font-medium leading-[1.3] tracking-tight"
+                className="text-[#fffcf4] text-[18px] sm:text-[24px] md:text-[32px] lg:text-[36px] font-medium leading-[1.3] tracking-tight"
               />
             </div>
           </div>
 
           {/* Bottom Section: Avatar and Navigation */}
-          <div className="relative border-t border-[#222222] p-8 md:p-12 flex items-center justify-between mt-auto">
+          <div className="relative border-t border-[#222222] p-4 sm:p-8 md:p-12 flex items-center justify-between gap-3 mt-auto">
             {/* Intersection Stars */}
             <GridStar className="top-0 left-0" />
             <GridStar className="top-0 left-full" />
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
               <Image 
                 src={testimonials[currentIndex].avatar} 
                 width={48} 
                 height={48} 
                 alt={testimonials[currentIndex].name} 
-                className="rounded-full object-cover w-[48px] h-[48px]"
+                className="rounded-full object-cover w-10 h-10 sm:w-12 sm:h-12 shrink-0"
               />
-              <div className="flex flex-col">
-                <span className="text-[#fffcf4] font-medium text-[15px]">{testimonials[currentIndex].name}</span>
-                <span className="text-[#b2b1ab] text-[13px]">{testimonials[currentIndex].position}</span>
+              <div className="flex flex-col min-w-0">
+                <span className="text-[#fffcf4] font-medium text-[13px] sm:text-[15px] truncate">{testimonials[currentIndex].name}</span>
+                <span className="text-[#b2b1ab] text-[11px] sm:text-[13px] truncate">{testimonials[currentIndex].position}</span>
               </div>
             </div>
 
             {/* Navigation Arrows */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
               <button 
                 onClick={prevSlide}
-                className="w-10 h-10 bg-[#fffcf4] hover:bg-gray-200 transition-colors flex items-center justify-center rounded-[2px] cursor-pointer"
+                className="w-8 h-8 sm:w-10 sm:h-10 bg-[#fffcf4] hover:bg-gray-200 transition-colors flex items-center justify-center rounded-[2px] cursor-pointer"
                 aria-label="Vorheriger Beitrag"
               >
-                <ArrowLeft className="w-5 h-5 text-black" strokeWidth={1.5} />
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-black" strokeWidth={1.5} />
               </button>
               <button 
                 onClick={nextSlide}
-                className="w-10 h-10 bg-[#fffcf4] hover:bg-gray-200 transition-colors flex items-center justify-center rounded-[2px] cursor-pointer"
+                className="w-8 h-8 sm:w-10 sm:h-10 bg-[#fffcf4] hover:bg-gray-200 transition-colors flex items-center justify-center rounded-[2px] cursor-pointer"
                 aria-label="Nächster Beitrag"
               >
-                <ArrowRight className="w-5 h-5 text-black" strokeWidth={1.5} />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-black" strokeWidth={1.5} />
               </button>
             </div>
           </div>

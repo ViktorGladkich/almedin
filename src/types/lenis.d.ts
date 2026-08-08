@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 declare module 'lenis' {
   export interface LenisOptions {
     duration?: number;

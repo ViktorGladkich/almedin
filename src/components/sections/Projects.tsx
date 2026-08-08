@@ -269,7 +269,7 @@ export function Projects() {
                 aria-label={`${project.title} ansehen`}
                 onKeyDown={(e) => onCardKey(e, index)}
                 onClick={() => openPreview(index)}
-                className={`content-img-wrap-${index} w-full h-full relative overflow-hidden rounded-xl sm:rounded-[20px] will-change-transform outline-none shadow-[0_40px_80px_-30px_rgba(13,13,13,0.45)] focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2`}
+                className={`content-img-wrap-${index} w-full h-full relative overflow-hidden rounded-xl sm:rounded-[20px] outline-none shadow-[0_40px_80px_-30px_rgba(13,13,13,0.45)] focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2`}
               >
                 <div
                   className="absolute inset-0 bg-cover bg-center"
@@ -324,7 +324,7 @@ export function Projects() {
           The page has a fixed frame at z-60 and a header above it, so the
           preview must sit above BOTH — at z-40/z-50 the cream border and the
           navigation painted on top of a fullscreen dark preview. */}
-      <div className="fixed inset-0 z-[80] pointer-events-none will-change-transform">
+      <div className="fixed inset-0 z-[80] pointer-events-none">
         <div className="overlay__inner absolute top-0 left-0 w-full h-full bg-[#131312]" />
       </div>
 
@@ -352,41 +352,41 @@ export function Projects() {
             </div>
 
             <h2 className="self-center justify-self-center m-0 overflow-hidden leading-none mix-blend-difference z-10 text-[clamp(3rem,14vw,12rem)] [grid-area:title]">
-              <span className={`preview-slide-text-${index} inline-block font-bold text-accent will-change-transform`}>
+              <span className={`preview-slide-text-${index} inline-block font-bold text-accent`}>
                 {project.title}
               </span>
             </h2>
 
             <h3 className="justify-self-center m-0 overflow-hidden font-light uppercase tracking-[0.2em] text-white text-lg md:text-2xl [grid-area:subtitle]">
-              <span className={`preview-slide-text-${index} inline-block will-change-transform`}>
+              <span className={`preview-slide-text-${index} inline-block`}>
                 {project.subtitle}
               </span>
             </h3>
 
             <span className="justify-self-center overflow-hidden uppercase tracking-[0.2em] text-[12px] text-white/50 [grid-area:meta]">
-              <span className={`preview-slide-text-${index} inline-block will-change-transform`}>
+              <span className={`preview-slide-text-${index} inline-block`}>
                 {project.year}
               </span>
             </span>
 
             <div className="relative max-w-[450px] p-4 justify-self-center md:justify-self-start text-center md:text-left [grid-area:box-left]">
               <h4 className="m-0 mb-2 overflow-hidden font-normal uppercase tracking-[0.2em] text-[11px] text-white">
-                <span className={`preview-desc-${index} inline-block opacity-0 will-change-transform`}>
+                <span className={`preview-desc-${index} inline-block opacity-0`}>
                   Details
                 </span>
               </h4>
-              <p className={`preview-desc-${index} m-0 text-[13px] md:text-[14px] leading-relaxed text-white/70 opacity-0 will-change-transform`}>
+              <p className={`preview-desc-${index} m-0 text-[13px] md:text-[14px] leading-relaxed text-white/70 opacity-0`}>
                 {project.descriptionLeft}
               </p>
             </div>
 
             <div className="relative max-w-[450px] p-4 justify-self-center md:justify-self-end text-center md:text-right [grid-area:box-right]">
               <h4 className="m-0 mb-2 overflow-hidden font-normal uppercase tracking-[0.2em] text-[11px] text-white">
-                <span className={`preview-desc-${index} inline-block opacity-0 will-change-transform`}>
+                <span className={`preview-desc-${index} inline-block opacity-0`}>
                   Übersicht
                 </span>
               </h4>
-              <p className={`preview-desc-${index} m-0 text-[13px] md:text-[14px] leading-relaxed text-white/70 opacity-0 will-change-transform`}>
+              <p className={`preview-desc-${index} m-0 text-[13px] md:text-[14px] leading-relaxed text-white/70 opacity-0`}>
                 {project.descriptionRight}
               </p>
             </div>

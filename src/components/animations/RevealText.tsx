@@ -96,7 +96,7 @@ export function RevealText({
             split === 'line' && 'block'
           )}
         >
-          <span className="reveal-unit inline-block will-change-transform">
+          <span className="reveal-unit inline-block">
             {unit === ' ' ? '\u00A0' : unit}
             {split === 'word' && i < units.length - 1 ? '\u00A0' : ''}
           </span>

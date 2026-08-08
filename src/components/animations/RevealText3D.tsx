@@ -68,7 +68,7 @@ export function RevealText3D({
       style={{ perspective: '1000px' }}
     >
       {words.map((word, i) => (
-        <span key={i} className="reveal-word-3d inline-block origin-bottom will-change-transform">
+        <span key={i} className="reveal-word-3d inline-block origin-bottom">
           {word}
         </span>
       ))}

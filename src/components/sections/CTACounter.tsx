@@ -177,18 +177,18 @@ export function CTACounter() {
             <div className="flex flex-wrap justify-center gap-x-[0.25em] gap-y-[0.1em] text-[26px] xs:text-[30px] sm:text-5xl md:text-6xl lg:text-7xl font-display font-medium text-[#fffcf4] leading-[1.15] sm:leading-tight tracking-tight mb-4 sm:mb-6">
               {headingWords.map((word, i) => (
                 <span key={i} className="overflow-hidden inline-flex pb-1.5 -mb-1.5">
-                  <span className="split-cta-inner inline-block will-change-transform origin-bottom-left opacity-0">
+                  <span className="split-cta-inner inline-block origin-bottom-left opacity-0">
                     {word}
                   </span>
                 </span>
               ))}
             </div>
 
-            <p className="cta-ui text-sm sm:text-lg md:text-xl text-[#fffcf4]/90 font-light mb-6 sm:mb-10 max-w-2xl opacity-0 will-change-transform">
+            <p className="cta-ui text-sm sm:text-lg md:text-xl text-[#fffcf4]/90 font-light mb-6 sm:mb-10 max-w-2xl opacity-0">
               Großartige Gebäude zeichnen sich nicht durch ihre Größe aus, sondern durch ihren Einfluss auf die Menschen, die sie nutzen.
             </p>
             
-            <div className="cta-ui flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-6 mt-2 sm:mt-4 w-full opacity-0 will-change-transform">
+            <div className="cta-ui flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-6 mt-2 sm:mt-4 w-full opacity-0">
               <CTAButton text="Projekt starten" href="/contact" size="responsive" className="shadow-2xl shadow-[#FF3131]/20" />
               <CTAButton text="Projekte erkunden" href="/projects" variant="light" size="responsive" className="shadow-2xl shadow-black/20" />
             </div>
@@ -237,17 +237,17 @@ export function CTACounter() {
 
             {/* Active Sectors */}
             <div className="w-full flex flex-col items-center gap-4 sm:gap-6">
-              <p className="cta-ui opacity-0 text-[#fffcf4]/80 text-[11px] sm:text-[12px] font-medium tracking-widest uppercase will-change-transform">
+              <p className="cta-ui opacity-0 text-[#fffcf4]/80 text-[11px] sm:text-[12px] font-medium tracking-widest uppercase">
                 Aktive Sektoren
               </p>
               <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[#fffcf4] text-xs sm:text-[15px] font-light">
-                <span className="cta-ui opacity-0 will-change-transform">Wohnbau</span>
-                <div className="cta-ui opacity-0 w-[1px] h-3 bg-white/20 will-change-transform" />
-                <span className="cta-ui opacity-0 will-change-transform">Gewerbe</span>
-                <div className="cta-ui opacity-0 w-[1px] h-3 bg-white/20 will-change-transform" />
-                <span className="cta-ui opacity-0 will-change-transform">Industrie</span>
-                <div className="cta-ui opacity-0 w-[1px] h-3 bg-white/20 will-change-transform" />
-                <span className="cta-ui opacity-0 will-change-transform">Mischnutzung</span>
+                <span className="cta-ui opacity-0">Wohnbau</span>
+                <div className="cta-ui opacity-0 w-[1px] h-3 bg-white/20" />
+                <span className="cta-ui opacity-0">Gewerbe</span>
+                <div className="cta-ui opacity-0 w-[1px] h-3 bg-white/20" />
+                <span className="cta-ui opacity-0">Industrie</span>
+                <div className="cta-ui opacity-0 w-[1px] h-3 bg-white/20" />
+                <span className="cta-ui opacity-0">Mischnutzung</span>
               </div>
             </div>
 

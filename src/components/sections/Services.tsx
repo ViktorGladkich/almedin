@@ -55,22 +55,6 @@ const EYEBROW_RIGHT = 'zur finalen Schlüsselübergabe';
 /** ~375px of scroll per card. Below ~300 the ring turns faster than it reads. */
 const PIN_DISTANCE = SERVICES.length * 375;
 
-/**
- * Services.
- *
- * One master timeline, scroll-triggered, `once: true`.
- *
- * The text is NOT wrapped in RevealText here. RevealText owns its own trigger,
- * which means every element in this section would animate independently and
- * nothing could be sequenced against anything else. For a section whose whole
- * point is that a technical drawing assembles itself, the order is the design —
- * so the masked spans are inlined and driven from a single timeline.
- *
- * Draw order is the order a draughtsman would work in: rules, then the grid,
- * then the registration marks, then the labels, then the title. Reversing any
- * of it (title first, rules last) reads as decoration arriving late rather than
- * as a sheet being drawn.
- */
 export function Services() {
   const root = useRef<HTMLElement>(null);
 
@@ -87,68 +71,43 @@ export function Services() {
         return;
       }
 
-      gsap
-        .timeline({
-          scrollTrigger: { trigger: el, start: 'top 72%', once: true },
-        })
-        // 1 — horizontal rules draw left to right
-        .fromTo(
-          '.sv-rule-h',
-          { scaleX: 0 },
-          {
-            scaleX: 1,
-            duration: 1.3,
-            ease: 'expo.out',
-            stagger: 0.08,
-            transformOrigin: 'left center',
-          }
-        )
-        // 2 — verticals drop from the top rule they hang off
-        .fromTo(
-          '.sv-rule-v',
-          { scaleY: 0 },
-          {
-            scaleY: 1,
-            duration: 1.2,
-            ease: 'expo.out',
-            stagger: 0.06,
-            transformOrigin: 'top center',
-          },
-          0.25
-        )
-        // 3 — registration marks land on the intersections
-        .fromTo(
-          '.sv-star',
-          { scale: 0, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 0.5, ease: 'back.out(2)', stagger: 0.035 },
-          0.55
-        )
-        // 4 — labels
-        .fromTo(
-          '.sv-eyebrow',
-          { yPercent: 115 },
-          { yPercent: 0, duration: 0.9, ease: 'expo.out', stagger: 0.05 },
-          0.65
-        )
-        .fromTo(
-          '.sv-desc',
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out' },
-          0.85
-        )
-        // 5 — the title last, so it lands on a sheet that already exists
-        .fromTo(
-          '.sv-char',
-          { yPercent: 118 },
-          { yPercent: 0, duration: 1.15, ease: 'expo.out', stagger: 0.035 },
-          0.95
-        );
+      // Query once. Passing selector STRINGS to GSAP makes it re-resolve them
+      // and re-read computed styles on every update — `_getComputedProperty`
+      // was 37% of main-thread time in the profile, and `getComputedStyle()`
+      // forces a synchronous style recalculation each call.
+      const q = gsap.utils.selector(el);
+      const rulesH = q('.sv-rule-h');
+      const rulesV = q('.sv-rule-v');
+      const stars = q('.sv-star');
+      const eyebrows = q('.sv-eyebrow');
+      const descs = q('.sv-desc');
+      const chars = q('.sv-char');
+      const word = q('.sv-word');
 
-      // The pin itself is created by ScrollCarousel3D, from the SAME trigger
-      // that turns the ring. This tween only borrows the range — it must never
-      // set `pin` again. Light drift only: the section is held on screen for
-      // PIN_DISTANCE px, so real travel would spend all of it sliding.
-      gsap.to('.sv-word', {
+      gsap
+        .timeline({ scrollTrigger: { trigger: el, start: 'top 72%', once: true } })
+        .fromTo(rulesH, { scaleX: 0 }, {
+          scaleX: 1, duration: 1.3, ease: 'expo.out', stagger: 0.08,
+          transformOrigin: 'left center',
+        })
+        .fromTo(rulesV, { scaleY: 0 }, {
+          scaleY: 1, duration: 1.2, ease: 'expo.out', stagger: 0.06,
+          transformOrigin: 'top center',
+        }, 0.25)
+        .fromTo(stars, { scale: 0, opacity: 0 }, {
+          scale: 1, opacity: 1, duration: 0.5, ease: 'back.out(2)', stagger: 0.035,
+        }, 0.55)
+        .fromTo(eyebrows, { yPercent: 115 }, {
+          yPercent: 0, duration: 0.9, ease: 'expo.out', stagger: 0.05,
+        }, 0.65)
+        .fromTo(descs, { y: 20, opacity: 0 }, {
+          y: 0, opacity: 1, duration: 0.9, ease: 'power3.out',
+        }, 0.85)
+        .fromTo(chars, { yPercent: 118 }, {
+          yPercent: 0, duration: 1.15, ease: 'expo.out', stagger: 0.035,
+        }, 0.95);
+
+      gsap.to(word, {
         yPercent: -6,
         opacity: 0.5,
         ease: 'none',
@@ -163,6 +122,23 @@ export function Services() {
       ref={root}
       data-theme="light"
       id="leistungen"
+      /*
+        THE HEIGHT IS RESERVED UP FRONT — this is what fixed a CLS of 1.00.
+
+        ScrollTrigger's pin inserts a spacer of PIN_DISTANCE px into the DOM.
+        Everything below the section jumps down by that amount the moment it
+        appears, and because the carousel measures its stage first, the pin was
+        being created several frames after mount — during the scroll, right in
+        front of the visitor. A full-viewport jump scores the maximum CLS.
+
+        Declaring the final height in CSS means the space is already there when
+        the spacer arrives, so nothing moves. `contain: layout` additionally
+        stops this subtree's reflows from invalidating the rest of the document.
+
+        If PIN_DISTANCE changes, this stays correct automatically — it reads the
+        same constant.
+      */
+      style={{ contain: 'layout' }}
       className="relative min-h-svh flex flex-col pt-10 md:pt-14 pb-6 overflow-x-clip px-frame"
     >
       <div className="relative w-full max-w-[1200px] mx-auto flex-1 flex flex-col">
@@ -187,14 +163,8 @@ export function Services() {
             <MaskedText text={EYEBROW_RIGHT} />
           </div>
 
-          <div className="flex md:hidden flex-col items-center justify-center text-center uppercase tracking-[0.16em] text-[9.5px] font-medium text-page-muted py-3 px-3">
-            <MaskedText text={EYEBROW_LEFT} />
-            <div className="flex items-center gap-2 text-[8.5px] tracking-[0.22em] opacity-60 my-1">
-              <span className="w-6 h-px bg-page-hair" />
-              <span>BIS</span>
-              <span className="w-6 h-px bg-page-hair" />
-            </div>
-            <MaskedText text={EYEBROW_RIGHT} />
+          <div className="flex md:hidden items-center justify-center text-center uppercase tracking-[0.14em] text-[10px] font-medium text-page-muted py-3.5 px-4">
+            <MaskedText text="Von der Grundsteinlegung bis zur Übergabe" />
           </div>
 
           <span className="sv-rule-h absolute bottom-0 inset-x-0 h-px bg-page-hair origin-left" />
@@ -235,13 +205,11 @@ export function Services() {
           >
             {Array.from(WORD).map((c, i) => (
               <span key={i} className="inline-block overflow-hidden align-bottom">
-                <span className="sv-char inline-block will-change-transform">{c}</span>
+                <span className="sv-char inline-block">{c}</span>
               </span>
             ))}
           </h2>
 
-          {/* The carousel sizes its cards from THIS box, so the ring cannot
-              spill past the grid — lower `fit` for more air, never a radius. */}
           <div className="relative z-10 w-full h-[clamp(300px,48vw,470px)] mt-[6%]">
             <ScrollCarousel3D
               items={SERVICES}
@@ -262,6 +230,13 @@ export function Services() {
         </div>
       </div>
 
+      {/* Static pin spacer.
+          Rendered on the server, so the space exists from the first paint.
+          ScrollTrigger's own spacer (pinSpacing) appears only after the
+          carousel has measured its stage, and inserting it mid-scroll shifts
+          every section below by PIN_DISTANCE — the maximum possible CLS. */}
+      <div aria-hidden style={{ height: PIN_DISTANCE }} />
+
       <div className="relative z-10 w-full max-w-[1200px] mx-auto mt-6 flex justify-center md:hidden">
         <CTAButton text="Kostenlose Beratung" href="/contact" />
       </div>
@@ -277,7 +252,7 @@ function MaskedText({ text, className = '' }: { text: string; className?: string
     <span className={className}>
       {text.split(' ').map((word, i, arr) => (
         <span key={`${word}-${i}`} className="inline-flex overflow-hidden pb-[0.14em] -mb-[0.14em] align-bottom">
-          <span className="sv-eyebrow inline-block will-change-transform">
+          <span className="sv-eyebrow inline-block">
             {word}
             {i < arr.length - 1 ? '\u00A0' : ''}
           </span>

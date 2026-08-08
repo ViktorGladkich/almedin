@@ -172,7 +172,13 @@ export function ScrollCarousel3D({
                 end: `+=${pinDistance}`,
                 scrub: 1,
                 pin: pinned,
-                pinSpacing: true,
+                // Spacing is reserved by the section itself (see below), so
+                // ScrollTrigger must not insert its own. Its spacer is created
+                // several frames after mount — once the stage has been measured
+                // — which means the whole document below jumps down mid-scroll.
+                // That was a CLS of 1.00. A spacer that is part of the initial
+                // render costs nothing, because nothing has to move for it.
+                pinSpacing: false,
                 anticipatePin: 1,
                 // Pinning inserts a spacer and changes total document height.
                 // Any trigger below this one computes its start/end against

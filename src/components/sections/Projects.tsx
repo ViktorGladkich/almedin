@@ -181,32 +181,41 @@ export function Projects() {
       //
       // The markers are zero-height siblings placed immediately before each
       // card, holding the card's true flow position and never moving.
+      const mm = gsap.matchMedia();
       const markers = gsap.utils.toArray<HTMLElement>('.project-marker');
 
-      markers.forEach((marker, i) => {
-        // Transform only. The old version scrubbed `filter: contrast()`, which
-        // forces a repaint every frame and cannot be composited.
-        gsap.fromTo(
-          `.content-img-wrap-${i}`,
-          { yPercent: 18, rotation: 8, scale: 0.88 },
-          {
-            yPercent: 0,
-            rotation: 0,
-            scale: 1,
-            ease: 'none',
-            scrollTrigger: { trigger: marker, start: 'top bottom', end: 'top top', scrub: true },
-          }
-        );
+      // Desktop (>= 1024px): Dynamic rotation & scale effect
+      mm.add('(min-width: 1024px)', () => {
+        markers.forEach((marker, i) => {
+          gsap.fromTo(
+            `.content-img-wrap-${i}`,
+            { yPercent: 18, rotation: 8, scale: 0.88 },
+            {
+              yPercent: 0,
+              rotation: 0,
+              scale: 1,
+              ease: 'none',
+              scrollTrigger: { trigger: marker, start: 'top bottom', end: 'top top', scrub: true },
+            }
+          );
 
-        // Cards alternate sides, so the card that replaces this one is i + 2.
-        const replacer = markers[i + 2];
-        if (replacer) {
-          gsap.to(`.project-card-${i}`, {
-            yPercent: -100,
-            ease: 'none',
-            scrollTrigger: { trigger: replacer, start: 'top bottom', end: 'top top', scrub: true },
-          });
-        }
+          // Cards alternate sides, so the card that replaces this one is i + 2.
+          const replacer = markers[i + 2];
+          if (replacer) {
+            gsap.to(`.project-card-${i}`, {
+              yPercent: -100,
+              ease: 'none',
+              scrollTrigger: { trigger: replacer, start: 'top bottom', end: 'top top', scrub: true },
+            });
+          }
+        });
+      });
+
+      // Mobile (< 1024px): Clean static stacking cards (no rotation, no scale jitter)
+      mm.add('(max-width: 1023px)', () => {
+        markers.forEach((_, i) => {
+          gsap.set(`.content-img-wrap-${i}`, { rotation: 0, scale: 1, yPercent: 0 });
+        });
       });
 
       const id = requestAnimationFrame(() => ScrollTrigger.refresh());

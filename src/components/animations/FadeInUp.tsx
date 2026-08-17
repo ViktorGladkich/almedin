@@ -99,7 +99,7 @@ export function FadeInUp({
       className={cn(variant === 'mask' && 'overflow-hidden', className)}
     >
       {variant === 'mask' ? (
-        <div>{children}</div>
+        <div className="will-change-transform">{children}</div>
       ) : (
         children
       )}

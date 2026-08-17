@@ -46,7 +46,7 @@ export function CTAButton({
     <>
       {/* Text area — slides RIGHT on hover */}
       <div
-        className={`inline-flex items-center justify-center ${heightClass} ${pxClass} ${bgClass} ${textClass} transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${hoverTranslateClass} rounded-l-[10px]`}
+        className={`inline-flex items-center justify-center ${heightClass} ${pxClass} ${bgClass} ${textClass} transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-transform ${hoverTranslateClass} rounded-l-[10px]`}
         style={{ backfaceVisibility: 'hidden' }}
       >
         <span className={`${fontClass} font-bold uppercase whitespace-nowrap`}>
@@ -56,11 +56,11 @@ export function CTAButton({
 
       {/* Right arrow — starts flat (→), rotates OUT upward on hover */}
       <div
-        className={`relative overflow-hidden ${arrowDimClass} transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rounded-r-[10px]`}
+        className={`relative overflow-hidden ${arrowDimClass} transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-transform rounded-r-[10px]`}
         style={{ backfaceVisibility: 'hidden' }}
       >
         <div
-          className={`absolute inset-0 grid place-items-center ${bgClass} ${textClass} transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover/cta:-rotate-90 rounded-r-[10px]`}
+          className={`absolute inset-0 grid place-items-center ${bgClass} ${textClass} transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-transform group-hover/cta:-rotate-90 rounded-r-[10px]`}
           style={{
             transformOrigin: '100% 0%',
             backfaceVisibility: 'hidden',
@@ -76,7 +76,7 @@ export function CTAButton({
       {/* Left arrow — hidden, slides IN from left on hover, already rotated ↗ */}
       <div className={`absolute left-0 top-0 overflow-hidden ${arrowDimClass} pointer-events-none rounded-l-[10px]`}>
         <div
-          className={`absolute inset-0 grid place-items-center ${hoverBgClass} ${hoverTextClass} transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rotate-90 group-hover/cta:rotate-0 rounded-l-[10px]`}
+          className={`absolute inset-0 grid place-items-center ${hoverBgClass} ${hoverTextClass} transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-transform rotate-90 group-hover/cta:rotate-0 rounded-l-[10px]`}
           style={{
             transformOrigin: '0% 100%',
             backfaceVisibility: 'hidden',

@@ -122,23 +122,6 @@ export function Services() {
       ref={root}
       data-theme="light"
       id="leistungen"
-      /*
-        THE HEIGHT IS RESERVED UP FRONT — this is what fixed a CLS of 1.00.
-
-        ScrollTrigger's pin inserts a spacer of PIN_DISTANCE px into the DOM.
-        Everything below the section jumps down by that amount the moment it
-        appears, and because the carousel measures its stage first, the pin was
-        being created several frames after mount — during the scroll, right in
-        front of the visitor. A full-viewport jump scores the maximum CLS.
-
-        Declaring the final height in CSS means the space is already there when
-        the spacer arrives, so nothing moves. `contain: layout` additionally
-        stops this subtree's reflows from invalidating the rest of the document.
-
-        If PIN_DISTANCE changes, this stays correct automatically — it reads the
-        same constant.
-      */
-      style={{ contain: 'layout' }}
       className="relative min-h-svh flex flex-col pt-10 md:pt-14 pb-6 overflow-x-clip px-frame"
     >
       <div className="relative w-full max-w-[1200px] mx-auto flex-1 flex flex-col">

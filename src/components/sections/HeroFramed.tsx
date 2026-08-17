@@ -92,7 +92,7 @@ export function HeroFramed({
         {/* Outer layer: scroll only */}
         <div className="hf-parallax absolute inset-0 will-change-transform">
           {/* Inner layer: entrance only */}
-          <div className="hf-zoom absolute inset-0">
+          <div className="hf-zoom absolute inset-0 will-change-transform">
             <video
               className="absolute inset-0 w-full h-full object-cover"
               poster={posterSrc}
@@ -114,9 +114,9 @@ export function HeroFramed({
             where it sits bottom-left and bottom-right. */}
         <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-t from-[#0D0D0D]/95 via-[#0D0D0D]/50 to-black/20 md:bg-gradient-to-tl md:from-[#0D0D0D]/85 md:via-[#0D0D0D]/35 md:to-transparent" />
 
-        <div className="hf-overlay absolute inset-0 z-10 flex flex-col justify-end p-4 xs:p-5 sm:p-7 md:p-10 lg:p-14">
+        <div className="hf-overlay absolute inset-0 z-10 flex flex-col justify-end p-4 xs:p-5 sm:p-7 md:p-10 lg:p-14 will-change-transform">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 sm:gap-5 lg:gap-12">
-            <h1 className="m-0 font-sans font-medium uppercase text-[#F2F0EC] leading-[1.08] sm:leading-[1.05] tracking-[-0.02em] text-[clamp(1.75rem,7vw,6rem)]">
+            <h1 className="m-0 font-sans font-medium uppercase text-[#F2F0EC] leading-[1.08] sm:leading-[1.05] tracking-[-0.02em] text-[clamp(1.75rem,5vw,4.5rem)]">
               {LINES.map((line) => (
                 // pt/-mt clears ascenders, pb/-mb clears descenders. Without the
                 // negative margins the mask padding becomes real leading and the
@@ -125,7 +125,7 @@ export function HeroFramed({
                   key={line}
                   className="block overflow-hidden pt-[0.2em] -mt-[0.2em] pb-[0.12em] -mb-[0.12em]"
                 >
-                  <span className="hf-line block">{line}</span>
+                  <span className="hf-line block will-change-transform">{line}</span>
                 </span>
               ))}
             </h1>

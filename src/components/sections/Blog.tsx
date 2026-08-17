@@ -169,7 +169,7 @@ export function Blog() {
                 className="w-full lg:w-[440px] shrink-0 mt-5 lg:mt-0 relative overflow-hidden rounded-lg sm:rounded-xl aspect-[1.7/1] sm:aspect-[1.5/1] z-10 pointer-events-none"
                 style={{ perspective: '1000px', background: 'var(--page-surface)' }}
               >
-                <div className="blog-tilt w-full h-full">
+                <div className="blog-tilt w-full h-full will-change-transform">
                   <ImageMaskFilter src={post.image} id={`blog-${post.id}`} grain={false} />
                 </div>
               </div>
